@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,7 +19,9 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         // Obtener referencia al título
-        TextView titleFadeIn = findViewById(R.id.title_top);
+        View titleFadeIn = findViewById(R.id.title_top);
+        titleFadeIn.setAlpha(0);
+        titleFadeIn.animate().alpha(1).setDuration(2000);
 
         // Crear animación de alpha con ObjectAnimator
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(titleFadeIn, "alpha", 0f, 1f);

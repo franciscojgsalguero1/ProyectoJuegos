@@ -24,6 +24,11 @@ public class JuegoLaEscoba extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.juegolaescoba);
 
+        Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        backToMenuButton.setOnClickListener(v -> {
+            finish();
+        });
+
         // Inicializar vistas
         tvMesa = findViewById(R.id.tvMesa);
         tvJugador = findViewById(R.id.tvJugador);
