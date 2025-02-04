@@ -1,105 +1,399 @@
 package practica.pruebas.proyectojuegos.juego2048;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.text.InputType;
+import android.view.Gravity;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import practica.pruebas.proyectojuegos.OnSwipeTouchListener;
 
 import practica.pruebas.proyectojuegos.R;
 
 public class Juego2048 extends AppCompatActivity {
 
-    private int[][] grid = new int[4][4];
     private GridLayout gridLayout;
-    private TextView scoreTextView;
-    private int score = 0;
-    private int highScore = 0;
+    private Ficha[][] fichas;
+    private static int GRID_SIZE = 4;
+    private int score;
+    private TextView scoreLabel;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.juego2048);
-            // Placeholder for Game 1 logic
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-            gridLayout = findViewById(R.id.grid_layout);
-            scoreTextView = findViewById(R.id.score_text_view);
-            Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        preguntarTamanoTablero(); // Preguntar el tamaño del tablero
 
-            SharedPreferences prefs = getSharedPreferences("Game2048", MODE_PRIVATE);
-            highScore = prefs.getInt("highScore", 0);
+        setContentView(R.layout.activity_juego2048);
 
-            backToMenuButton.setOnClickListener(v -> {
-                finish();
-            });
+        gridLayout = findViewById(R.id.gridLayout);
+        scoreLabel = findViewById(R.id.scoreLabel);
 
-            initializeGame();
-        }
-
-    private void initializeGame() {
-        addRandomNumber();
-        addRandomNumber();
-        updateUI();
     }
 
-    private void addRandomNumber() {
-        // Implementación de añadir número aleatorio...
+    private void preguntarTamanoTablero() {
+        // Crear un EditText para que el usuario introduzca el tamaño
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER); // Solo permite números
+        input.setHint("Por ejemplo: 4");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Tamaño del tablero")
+                .setMessage("Introduce un número para el tamaño del tablero (mínimo 3 y máximo 8):")
+                .setView(input)
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    try {
+                        // Intentar convertir la entrada a un número
+                        int tamano = Integer.parseInt(input.getText().toString());
+
+                        // Validar que el tamaño esté en el rango permitido
+                        if (tamano >= 3 && tamano <= 8) {
+                            GRID_SIZE = tamano; // Establecer el tamaño del tablero
+                            iniciarJuego(); // Llamar al metodo para inicializar el tablero
+                        } else {
+                            Toast.makeText(this, "El tamaño debe estar entre 3 y 8.", Toast.LENGTH_SHORT).show();
+                            preguntarTamanoTablero(); // Volver a preguntar
+                        }
+                    } catch (NumberFormatException e) {
+                        // Manejar errores si el usuario no introduce un número válido
+                        Toast.makeText(this, "Introduce un número válido.", Toast.LENGTH_SHORT).show();
+                        preguntarTamanoTablero(); // Volver a preguntar
+                    }
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> {
+                    Toast.makeText(this, "Debe seleccionarse un tamaño para el tablero.", Toast.LENGTH_SHORT).show();
+                    preguntarTamanoTablero(); // Volver a preguntar si cancela
+                })
+                .setCancelable(false) // Evitar que el usuario cierre el diálogo sin elegir
+                .show();
     }
 
-    private void updateUI() {
-        if (score > highScore) {
-            highScore = score;
+    private void iniciarJuego() {
+        gridLayout.removeAllViews(); // Limpiar el tablero si ya existe
+        gridLayout.setColumnCount(GRID_SIZE);
+        gridLayout.setRowCount(GRID_SIZE);
+
+        fichas = new Ficha[GRID_SIZE][GRID_SIZE];
+        initializeGameBoard();
+
+        // añadimor 2 fichas random
+        for (int i = 0; i < 2; i++) {
+            addRandomFicha();
         }
-        scoreTextView.setText("Score: " + score + " | High Score: " + highScore);
-        gridLayout.removeAllViews();
+        configurarGestos(); // Configurar el listener de gestos
+    }
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                TextView cell = new TextView(this);
-                cell.setText(grid[i][j] == 0 ? "" : String.valueOf(grid[i][j]));
-                cell.setTextSize(24);
-                cell.setGravity(View.TEXT_ALIGNMENT_CENTER);
-                cell.setBackgroundColor(getCellColor(grid[i][j]));
-                cell.setTextColor(getResources().getColor(android.R.color.white));
-                cell.setScaleX(0.8f);
-                cell.setScaleY(0.8f);
-                cell.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
-
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = gridLayout.getWidth() / 4;
-                params.height = gridLayout.getHeight() / 4;
-                cell.setLayoutParams(params);
-                gridLayout.addView(cell);
+    private void initializeGameBoard() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                Ficha ficha = new Ficha(0, i, j);
+                fichas[i][j] = ficha;
+                addFichaToGrid(ficha);
             }
         }
     }
 
-    private int getCellColor(int value) {
-        switch (value) {
-            case 2: return getResources().getColor(R.color.color2);
-            case 4: return getResources().getColor(R.color.color4);
-            case 8: return getResources().getColor(R.color.color8);
-            case 16: return getResources().getColor(R.color.color16);
-            case 32: return getResources().getColor(R.color.color32);
-            case 64: return getResources().getColor(R.color.color64);
-            case 128: return getResources().getColor(R.color.color128);
-            case 256: return getResources().getColor(R.color.color256);
-            case 512: return getResources().getColor(R.color.color512);
-            case 1024: return getResources().getColor(R.color.color1024);
-            case 2048: return getResources().getColor(R.color.color2048);
-            default: return getResources().getColor(android.R.color.darker_gray);
+    private void addFichaToGrid(Ficha ficha) {
+        TextView tile = new TextView(this);
+        tile.setGravity(Gravity.CENTER);
+        tile.setTextSize(24);
+        tile.setBackgroundColor(ContextCompat.getColor(this, R.color.tile_empty));
+        tile.setText(ficha.getValor() > 0 ? String.valueOf(ficha.getValor()) : "");
+
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+        params.width = 0;
+        params.height = 0;
+        params.columnSpec = GridLayout.spec(ficha.getColumna(), 1, 1.0f);
+        params.rowSpec = GridLayout.spec(ficha.getFila(), 1, 1.0f);
+        params.setMargins(8, 8, 8, 8);
+
+        gridLayout.addView(tile, params);
+    }
+
+    private void updateFichaView(Ficha ficha) {
+        TextView tile = (TextView) gridLayout.getChildAt(ficha.getFila() * GRID_SIZE + ficha.getColumna());
+        if (ficha.getValor() == 0) {
+            tile.setBackgroundColor(ContextCompat.getColor(this, R.color.tile_empty));
+            tile.setText("");
+        } else {
+            tile.setBackgroundColor(ContextCompat.getColor(this, ficha.getColor()));
+            tile.setText(String.valueOf(ficha.getValor()));
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        SharedPreferences.Editor editor = getSharedPreferences("Game2048", MODE_PRIVATE).edit();
-        editor.putInt("highScore", highScore);
-        editor.apply();
+    private void addRandomFicha() {
+        List<Ficha> emptySlots = new ArrayList<>();
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (fichas[i][j].getValor() == 0) {
+                    //fichas[i][j].setValor(1024); para comprobar la victoria
+                    emptySlots.add(fichas[i][j]);
+                }
+            }
+        }
 
+        if (!emptySlots.isEmpty()) {
+            Ficha ficha = emptySlots.get(new Random().nextInt(emptySlots.size()));
+            ficha.setValor(new Random().nextInt(10) < 9 ? 2 : 4);
+            updateFichaView(ficha);
+        }
+    }
+
+    private void updateScore(int points) {
+        score += points;
+        scoreLabel.setText("Score: " + score);
+    }
+
+    private void configurarGestos() {
+        gridLayout.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeUp() {
+                moveUp(); // Mover las fichas hacia arriba
+                verificarEstadoJuego();
+            }
+
+            @Override
+            public void onSwipeDown() {
+                moveDown(); // Mover las fichas hacia abajo
+                verificarEstadoJuego();
+            }
+
+            @Override
+            public void onSwipeLeft() {
+                moveLeft(); // Mover las fichas hacia la izquierda
+                verificarEstadoJuego();
+            }
+
+            @Override
+            public void onSwipeRight() {
+                moveRight(); // Mover las fichas hacia la derecha
+                verificarEstadoJuego();
+            }
+        });
+    }
+
+
+    public void moveUp() {
+        boolean moved = false; // Para saber si se hizo algún movimiento
+
+        for (int col = 0; col < GRID_SIZE; col++) {
+            for (int row = 1; row < GRID_SIZE; row++) { // Empezamos desde la segunda fila
+                if (fichas[row][col].getValor() != 0) {
+                    int targetRow = row;
+
+                    // Buscar la posición más arriba donde pueda moverse
+                    for (int nextRow = row - 1; nextRow >= 0; nextRow--) {
+                        if (fichas[nextRow][col].getValor() == 0) {
+                            targetRow = nextRow; // Mover hacia arriba
+                        } else if (fichas[nextRow][col].getValor() == fichas[row][col].getValor() && !fichas[nextRow][col].isMerged()) {
+                            targetRow = nextRow; // Fusionar
+                            updateScore(fichas[row][col].getValor() * 2);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (targetRow != row) {
+                        // Fusionar o mover ficha
+                        if (fichas[targetRow][col].getValor() == fichas[row][col].getValor() && !fichas[targetRow][col].isMerged()) {
+                            fichas[targetRow][col].fusionar(fichas[row][col]);
+                        } else {
+                            fichas[targetRow][col].setValor(fichas[row][col].getValor());
+                            fichas[row][col].setValor(0);
+                        }
+
+                        updateFichaView(fichas[targetRow][col]);
+                        updateFichaView(fichas[row][col]);
+                        moved = true;
+                    }
+                }
+            }
+        }
+
+        resetMergedStatus(); // Reiniciar estado de fusión
+        if (moved) {
+            addRandomFicha(); // Añadir una nueva ficha solo si hubo movimiento
+        }
+    }
+
+
+    private void moveDown() {
+        boolean moved = false;
+        for (int col = 0; col < GRID_SIZE; col++) {
+            for (int row = GRID_SIZE - 2; row >= 0; row--) {
+                if (fichas[row][col].getValor() != 0) {
+                    int targetRow = row;
+                    for (int nextRow = row + 1; nextRow < GRID_SIZE; nextRow++) {
+                        if (fichas[nextRow][col].getValor() == 0) {
+                            targetRow = nextRow;
+                        } else if (fichas[nextRow][col].getValor() == fichas[row][col].getValor() && !fichas[nextRow][col].isMerged()) {
+                            targetRow = nextRow;
+                            updateScore(fichas[row][col].getValor() * 2);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (targetRow != row) {
+                        if (fichas[targetRow][col].getValor() == fichas[row][col].getValor() && !fichas[targetRow][col].isMerged()) {
+                            fichas[targetRow][col].fusionar(fichas[row][col]);
+                        } else {
+                            fichas[targetRow][col].setValor(fichas[row][col].getValor());
+                            fichas[row][col].setValor(0);
+                        }
+                        updateFichaView(fichas[targetRow][col]);
+                        updateFichaView(fichas[row][col]);
+                        moved = true;
+                    }
+                }
+            }
+        }
+        resetMergedStatus();
+        if (moved) {
+            addRandomFicha();
+        }
+    }
+
+    private void moveLeft() {
+        boolean moved = false;
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 1; col < GRID_SIZE; col++) {
+                if (fichas[row][col].getValor() != 0) {
+                    int targetCol = col;
+                    for (int nextCol = col - 1; nextCol >= 0; nextCol--) {
+                        if (fichas[row][nextCol].getValor() == 0) {
+                            targetCol = nextCol;
+                        } else if (fichas[row][nextCol].getValor() == fichas[row][col].getValor() && !fichas[row][nextCol].isMerged()) {
+                            targetCol = nextCol;
+                            updateScore(fichas[row][col].getValor() * 2);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (targetCol != col) {
+                        if (fichas[row][targetCol].getValor() == fichas[row][col].getValor() && !fichas[row][targetCol].isMerged()) {
+                            fichas[row][targetCol].fusionar(fichas[row][col]);
+                        } else {
+                            fichas[row][targetCol].setValor(fichas[row][col].getValor());
+                            fichas[row][col].setValor(0);
+                        }
+                        updateFichaView(fichas[row][targetCol]);
+                        updateFichaView(fichas[row][col]);
+                        moved = true;
+                    }
+                }
+            }
+        }
+        resetMergedStatus();
+        if (moved) {
+            addRandomFicha();
+        }
+    }
+
+    private void moveRight() {
+        boolean moved = false;
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = GRID_SIZE - 2; col >= 0; col--) {
+                if (fichas[row][col].getValor() != 0) {
+                    int targetCol = col;
+                    for (int nextCol = col + 1; nextCol < GRID_SIZE; nextCol++) {
+                        if (fichas[row][nextCol].getValor() == 0) {
+                            targetCol = nextCol;
+                        } else if (fichas[row][nextCol].getValor() == fichas[row][col].getValor() && !fichas[row][nextCol].isMerged()) {
+                            targetCol = nextCol;
+                            updateScore(fichas[row][col].getValor() * 2);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (targetCol != col) {
+                        if (fichas[row][targetCol].getValor() == fichas[row][col].getValor() && !fichas[row][targetCol].isMerged()) {
+                            fichas[row][targetCol].fusionar(fichas[row][col]);
+                        } else {
+                            fichas[row][targetCol].setValor(fichas[row][col].getValor());
+                            fichas[row][col].setValor(0);
+                        }
+                        updateFichaView(fichas[row][targetCol]);
+                        updateFichaView(fichas[row][col]);
+                        moved = true;
+                    }
+                }
+            }
+        }
+        resetMergedStatus();
+        if (moved) {
+            addRandomFicha();
+        }
+    }
+
+    private void resetMergedStatus() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                fichas[i][j].reiniciarFusion();
+            }
+        }
+    }
+
+    private void verificarEstadoJuego() {
+        if (checkVictory()) {
+            finalizarJuego("¡Has ganado!");
+        } else if (checkGameOver()) {
+            finalizarJuego("No hay movimientos posibles. ¡Has perdido!");
+        }
+    }
+
+    private boolean checkVictory() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (fichas[i][j].getValor() == 2048) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkGameOver() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (fichas[i][j].getValor() == 0) {
+                    return false;
+                }
+                if (i > 0 && fichas[i][j].getValor() == fichas[i - 1][j].getValor()) {
+                    return false;
+                }
+                if (i < GRID_SIZE - 1 && fichas[i][j].getValor() == fichas[i + 1][j].getValor()) {
+                    return false;
+                }
+                if (j > 0 && fichas[i][j].getValor() == fichas[i][j - 1].getValor()) {
+                    return false;
+                }
+                if (j < GRID_SIZE - 1 && fichas[i][j].getValor() == fichas[i][j + 1].getValor()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void finalizarJuego(String mensaje) {
+        new AlertDialog.Builder(this)
+                .setTitle("Fin del juego")
+                .setMessage(mensaje + "\n¿Quieres jugar de nuevo? \n")
+                .setPositiveButton("Sí", (dialog, which) -> iniciarJuego())
+                .setNegativeButton("No", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 }

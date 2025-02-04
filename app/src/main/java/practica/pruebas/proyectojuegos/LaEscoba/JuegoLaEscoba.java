@@ -2,6 +2,7 @@ package practica.pruebas.proyectojuegos.LaEscoba;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,7 +15,7 @@ import practica.pruebas.proyectojuegos.R;
 public class JuegoLaEscoba extends AppCompatActivity {
 
     private Partida partida;
-    private Jugador jugadorActual;
+    private JugadorLaEscoba jugadorLaEscobaActual;
     private LinearLayout mesaCartasLayout, cartasJugadorLayout;
     private TextView tvMesa, tvJugador;
     private Button btnJugar;
@@ -37,42 +38,81 @@ public class JuegoLaEscoba extends AppCompatActivity {
         btnJugar = findViewById(R.id.btnJugar);
 
         // Configurar partida
-        ArrayList<Jugador> jugadores = new ArrayList<>();
-        jugadores.add(new Jugador("Jugador 1"));
-        jugadores.add(new Jugador("Jugador 2"));
+        ArrayList<JugadorLaEscoba> jugadores = new ArrayList<>();
+        jugadores.add(new JugadorLaEscoba("Jugador 1"));
+        jugadores.add(new JugadorLaEscoba("Jugador 2"));
         partida = new Partida(jugadores);
-        jugadorActual = jugadores.get(0);
+        jugadorLaEscobaActual = jugadores.get(0);
 
         // Mostrar cartas iniciales
-        actualizarVista();
+        try {
+            actualizarVista();
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // Acción del botón Jugar
-        btnJugar.setOnClickListener(view -> realizarJugada());
+        btnJugar.setOnClickListener(view -> {
+            try {
+                realizarJugada();
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    private void actualizarVista() {
-        // Mostrar cartas en la mesa
+    private void actualizarVista() throws NoSuchFieldException, IllegalAccessException {
+        // Limpiar vistas anteriores
+        cartasJugadorLayout.removeAllViews();
         mesaCartasLayout.removeAllViews();
+
+        // Mostrar cartas en la mesa
         for (Carta carta : partida.getMesa()) {
-            TextView cartaView = new TextView(this);
-            cartaView.setText(carta.toString());
+            ImageView cartaView = new ImageView(this);
+            cartaView.setImageResource(carta.getImageResourceId());
+
+            // Configurar tamaño de la imagen
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 200);
+            params.setMargins(10, 10, 10, 10);
+            cartaView.setLayoutParams(params);
+
             mesaCartasLayout.addView(cartaView);
         }
 
         // Mostrar cartas del jugador actual
-        cartasJugadorLayout.removeAllViews();
-        for (Carta carta : jugadorActual.getCartasEnMano()) {
-            TextView cartaView = new TextView(this);
-            cartaView.setText(carta.toString());
+        for (Carta carta : jugadorLaEscobaActual.getCartasEnMano()) {
+            ImageView cartaView = new ImageView(this);
+            cartaView.setImageResource(carta.getImageResourceId());
+
+            // Configurar tamaño de la imagen
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 200);
+            params.setMargins(10, 10, 10, 10);
+            cartaView.setLayoutParams(params);
+
+            // Hacer que la carta sea seleccionable
+            cartaView.setOnClickListener(v -> {
+                try {
+                    seleccionarCarta(carta);
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
             cartasJugadorLayout.addView(cartaView);
         }
     }
 
-    private void realizarJugada() {
+    private void realizarJugada() throws NoSuchFieldException, IllegalAccessException {
         // Ejemplo: el jugador juega la primera carta
-        if (!jugadorActual.getCartasEnMano().isEmpty()) {
-            Carta carta = jugadorActual.getCartasEnMano().get(0);
-            partida.jugarTurno(jugadorActual, carta, new ArrayList<>());
+        if (!jugadorLaEscobaActual.getCartasEnMano().isEmpty()) {
+            Carta carta = jugadorLaEscobaActual.getCartasEnMano().get(0);
+            partida.jugarTurno(jugadorLaEscobaActual, carta, new ArrayList<>());
             actualizarVista();
 
             // Cambiar al siguiente jugador
@@ -82,7 +122,16 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
     private void cambiarTurno() {
         // Alternar entre los jugadores
-        int indiceActual = partida.getJugadores().indexOf(jugadorActual);
-        jugadorActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
+        int indiceActual = partida.getJugadores().indexOf(jugadorLaEscobaActual);
+        jugadorLaEscobaActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
     }
+
+    private void seleccionarCarta(Carta cartaSeleccionada) throws NoSuchFieldException, IllegalAccessException {
+        // Ejemplo: jugar la carta seleccionada
+        partida.jugarTurno(jugadorLaEscobaActual, cartaSeleccionada, new ArrayList<>());
+        actualizarVista();
+        cambiarTurno();
+    }
+
+
 }

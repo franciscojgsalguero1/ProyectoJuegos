@@ -8,14 +8,15 @@ public class Baraja {
 
     public Baraja() {
         this.cartas = new ArrayList<>();
-        String[] palos = {"Oros", "Copas", "Espadas", "Bastos"};
+        String[] palos = {"clubs", "goblets", "golden", "swords"};
 
         for (String palo : palos) {
-            for (int i = 1; i <= 10; i++) {
-                cartas.add(new Carta(palo, i));
+            for (int i = 1; i <= 12; i++) {
+                if (i != 8 && i != 9) {
+                    cartas.add(new Carta(palo, i));
+                }
             }
         }
-
         Collections.shuffle(cartas);
     }
 

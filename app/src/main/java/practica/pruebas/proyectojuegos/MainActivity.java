@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,5 +52,21 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Pedir el nombre del jugador
+        JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
+            guardarNombreJugador(jugadorGeneral.getNombre());
+        });
+    }
+
+    private String obtenerNombreJugador() {
+        return getSharedPreferences("jugadorPrefs", MODE_PRIVATE).getString("nombreJugador", "Jugador");
+    }
+
+    private void guardarNombreJugador(String nombre) {
+        getSharedPreferences("jugadorPrefs", MODE_PRIVATE)
+                .edit()
+                .putString("nombreJugador", nombre)
+                .apply();
     }
 }

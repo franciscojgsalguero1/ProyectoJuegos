@@ -3,11 +3,11 @@ package practica.pruebas.proyectojuegos.LaEscoba;
 import java.util.ArrayList;
 
 public class Partida {
-    private ArrayList<Jugador> jugadores;
+    private ArrayList<JugadorLaEscoba> jugadores;
     private Baraja baraja;
     private ArrayList<Carta> mesa;
 
-    public Partida(ArrayList<Jugador> jugadores) {
+    public Partida(ArrayList<JugadorLaEscoba> jugadores) {
         this.jugadores = jugadores;
         this.baraja = new Baraja();
         this.mesa = new ArrayList<>();
@@ -15,8 +15,8 @@ public class Partida {
     }
 
     private void repartirCartasIniciales() {
-        for (Jugador jugador : jugadores) {
-            jugador.recibirCartas(baraja.repartir(3));
+        for (JugadorLaEscoba jugadorLaEscoba : jugadores) {
+            jugadorLaEscoba.recibirCartas(baraja.repartir(3));
         }
         for (int i = 0; i < 4; i++) {
             mesa.add(baraja.repartirUna());
@@ -27,25 +27,25 @@ public class Partida {
         return mesa;
     }
 
-    public ArrayList<Jugador> getJugadores() {
+    public ArrayList<JugadorLaEscoba> getJugadores() {
         return jugadores;
     }
 
-    public void jugarTurno(Jugador jugador, Carta cartaJugador, ArrayList<Carta> cartasMesaSeleccionadas) {
+    public void jugarTurno(JugadorLaEscoba jugadorLaEscoba, Carta cartaJugador, ArrayList<Carta> cartasMesaSeleccionadas) {
         if (verificarSuma15(cartaJugador, cartasMesaSeleccionadas)) {
             ArrayList<Carta> cartasGanadas = new ArrayList<>(cartasMesaSeleccionadas);
             cartasGanadas.add(cartaJugador);
-            jugador.ganarCartas(cartasGanadas);
+            jugadorLaEscoba.ganarCartas(cartasGanadas);
             mesa.removeAll(cartasMesaSeleccionadas);
 
             if (mesa.isEmpty()) {
-                System.out.println(jugador.getNombre() + " hizo una escoba!");
+                System.out.println(jugadorLaEscoba.getNombre() + " hizo una escoba!");
             }
         } else {
             mesa.add(cartaJugador);
         }
 
-        jugador.getCartasEnMano().remove(cartaJugador);
+        jugadorLaEscoba.getCartasEnMano().remove(cartaJugador);
     }
 
     private boolean verificarSuma15(Carta cartaJugador, ArrayList<Carta> cartasMesaSeleccionadas) {

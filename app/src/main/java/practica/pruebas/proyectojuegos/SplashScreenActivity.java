@@ -54,6 +54,8 @@ public class SplashScreenActivity extends AppCompatActivity {
             intent.putExtra("fromSplash", true); // Indicador para evitar repetir el Splash
             startActivity(intent);
             finish();
-        }, 5000); // 5 segundos de duración del SplashScreen
+        }, 100); // 100 segundos de duración del SplashScreen
     }
+
+
 }

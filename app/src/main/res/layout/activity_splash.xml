@@ -30,28 +30,28 @@
             android:id="@+id/splash1"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/bastos1"
+            android:src="@drawable/card_1_clubs"
             android:layout_margin="8dp" />
 
         <ImageView
             android:id="@+id/splash2"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/bastos1"
+            android:src="@drawable/card_1_goblets"
             android:layout_margin="8dp" />
 
         <ImageView
             android:id="@+id/splash3"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/bastos1"
+            android:src="@drawable/card_1_golden"
             android:layout_margin="8dp" />
 
         <ImageView
             android:id="@+id/splash4"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/bastos1"
+            android:src="@drawable/card_1_swords"
             android:layout_margin="8dp" />
     </GridLayout>
 
