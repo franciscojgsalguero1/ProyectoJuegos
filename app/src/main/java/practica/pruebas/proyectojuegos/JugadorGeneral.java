@@ -1,6 +1,7 @@
 package practica.pruebas.proyectojuegos;
 
 import android.content.Context;
+import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -12,8 +13,8 @@ public class JugadorGeneral {
 
     // Constructor con puntuación predeterminada
     public JugadorGeneral(String nombre) {
-        this.setNombre(nombre);
-        this.setPuntuacion(0);
+        this.nombre = nombre;
+        this.puntuacion = 0;
     }
 
     // Getter y Setter para el nombre
@@ -55,7 +56,9 @@ public class JugadorGeneral {
 
     // Metodo estático para pedir el nombre del jugador
     public static void pedirNombre(Context context, NombreCallback callback) {
+
         EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint("Introduce tu nombre");
 
         new AlertDialog.Builder(context)

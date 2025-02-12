@@ -36,4 +36,15 @@
         android:backgroundTint="#4CAF50"
         android:textColor="#FFFFFF" />
 
+    <Button
+        android:id="@+id/btn_view_ranking"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_start_game_la_escoba"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Ranking"
+        android:backgroundTint="#c934e7"
+        android:textColor="#FFFFFF" />
+
 </RelativeLayout>

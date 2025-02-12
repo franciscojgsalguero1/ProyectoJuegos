@@ -48,7 +48,7 @@ public class Partida {
         jugadorLaEscoba.getCartasEnMano().remove(cartaJugador);
     }
 
-    private boolean verificarSuma15(Carta cartaJugador, ArrayList<Carta> cartasMesaSeleccionadas) {
+    public boolean verificarSuma15(Carta cartaJugador, ArrayList<Carta> cartasMesaSeleccionadas) {
         int suma = cartaJugador.getValor();
         for (Carta carta : cartasMesaSeleccionadas) {
             suma += carta.getValor();

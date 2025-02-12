@@ -12,11 +12,11 @@ public class Carta {
     }
 
     public String getPalo() {
-        return palo;
+        return this.palo;
     }
 
     public int getValor() {
-        return valor;
+        return this.valor;
     }
 
     // Metodo para obtener el ID del recurso de la imagen

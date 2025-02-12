@@ -44,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        findViewById(R.id.btn_view_ranking).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, RankingActivity.class);
+            startActivity(intent);
+        });
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.menuTitle), (v, insets) -> {
@@ -53,10 +56,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        //lo ponemos para las pruebas
+        JugadorGeneral jugadorGeneral = new JugadorGeneral("Jugador 1 pruebas");
+        //lo comentamos para las pruebas
         // Pedir el nombre del jugador
-        JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
+        /*JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
             guardarNombreJugador(jugadorGeneral.getNombre());
-        });
+        });*/
     }
 
     private String obtenerNombreJugador() {

@@ -9,18 +9,30 @@
         android:id="@+id/tvTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Juego: La Escoba"
+        android:text="Juego: \n La Escoba"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvMesa"
+        android:id="@+id/tvPuntaje"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Puntaje: \n Jugador 1 - 0 | Jugador 2 - 0"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvMesa"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
         android:text="Mesa"
         android:textAlignment="center"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/mesaCartas"
@@ -32,24 +44,25 @@
     <TextView
         android:id="@+id/tvJugador"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tus cartas"
+        android:layout_height="35dp"
+        android:text="Mano"
         android:textAlignment="center"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/cartasJugador"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center" />
+        android:layout_height="138dp"
+        android:gravity="center"
+        android:orientation="horizontal" />
 
     <Button
         android:id="@+id/btnJugar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Jugar"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:text="Jugar" />
 
     <Button
         android:id="@+id/btn_back_to_menu"
