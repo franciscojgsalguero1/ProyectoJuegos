@@ -20,12 +20,11 @@ public class JuegoLaEscoba extends AppCompatActivity {
     private Partida partida;
     private JugadorLaEscoba jugadorLaEscobaActual;
     private LinearLayout mesaCartasLayout, cartasJugadorLayout;
-    private TextView tvMesa, tvJugador, tvPuntaje;
+    private TextView tvMesa, tvJugador, tvPuntaje, tvDeckSize;
     private Button btnJugar;
 
     private ArrayList<Carta> cartasSeleccionadasMesa = new ArrayList<>();
     private Carta cartaSeleccionadaMano = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,14 +41,18 @@ public class JuegoLaEscoba extends AppCompatActivity {
         tvMesa = findViewById(R.id.tvMesa);
         tvJugador = findViewById(R.id.tvJugador);
         tvPuntaje = findViewById(R.id.tvPuntaje);
+        tvDeckSize = findViewById(R.id.tvDeckSize);
         mesaCartasLayout = findViewById(R.id.mesaCartas);
         cartasJugadorLayout = findViewById(R.id.cartasJugador);
         btnJugar = findViewById(R.id.btnJugar);
 
         // Configurar partida
         ArrayList<JugadorLaEscoba> jugadores = new ArrayList<>();
-        jugadores.add(new JugadorLaEscoba("Jugador 1 prueba"));
-        jugadores.add(new JugadorLaEscoba("Jugador 2 prueba2"));
+        int numeroJugadores = 2;
+        for (int i = 0; i < numeroJugadores; i++) {
+            String nombreJugador = "Jugador " + (i + 1);
+            jugadores.add(new JugadorLaEscoba(nombreJugador));
+        }
         partida = new Partida(jugadores);
         jugadorLaEscobaActual = jugadores.get(0);
         tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
@@ -57,8 +60,6 @@ public class JuegoLaEscoba extends AppCompatActivity {
         // Mostrar cartas iniciales
         try {
             actualizarVista();
-            actualizarPuntaje(); // Actualizar el puntaje tras una jugada
-            //cambiarTurno(); cambiar turno entre jugadores
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +81,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
             cartaView.setImageResource(carta.getImageResourceId());
 
             // Configurar tamaño de la imagen
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(250, 400);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(220, 400);
             params.setMargins(margins, margins, margins, margins);
             cartaView.setLayoutParams(params);
 
@@ -105,19 +106,10 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
             cartasJugadorLayout.addView(cartaView);
         }
+
+        actualizarPuntaje(); // Actualizar el puntaje tras una jugada
+        actualizarTamañoBaraja(); // Enseñamos el tamaño de la baraja al jugador
     }
-
-    /*private void realizarJugada() throws NoSuchFieldException, IllegalAccessException {
-        // Ejemplo: el jugador juega la primera carta
-        if (!jugadorLaEscobaActual.getCartasEnMano().isEmpty()) {
-            Carta carta = jugadorLaEscobaActual.getCartasEnMano().get(0);
-            partida.jugarTurno(jugadorLaEscobaActual, carta, new ArrayList<>());
-            actualizarVista();
-
-            // Cambiar al siguiente jugador
-            cambiarTurno();
-        }
-    }*/
 
     private void realizarJugadaSeleccionada() {
         if (cartaSeleccionadaMano == null) {
@@ -127,12 +119,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
         if (cartaSeleccionadaMano != null && cartasSeleccionadasMesa.isEmpty()) {
             partida.getMesa().add(cartaSeleccionadaMano);
-            jugadorLaEscobaActual.getCartasEnMano().remove(cartaSeleccionadaMano);
-            try {
-                actualizarVista();
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            jugadorLaEscobaActual.eliminarCartaEnMano(cartaSeleccionadaMano);
             cambiarTurno();
         } else if (partida.verificarSuma15(cartaSeleccionadaMano, cartasSeleccionadasMesa)) {
             partida.jugarTurno(jugadorLaEscobaActual, cartaSeleccionadaMano, cartasSeleccionadasMesa);
@@ -141,27 +128,67 @@ public class JuegoLaEscoba extends AppCompatActivity {
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-            actualizarPuntaje();
             cambiarTurno();
         } else {
             Toast.makeText(this, "Las cartas no suman 15", Toast.LENGTH_SHORT).show();
         }
 
         // Reiniciar selección
+        try {
+            actualizarVista();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         cartaSeleccionadaMano = null;
         cartasSeleccionadasMesa.clear();
     }
 
 
     private void cambiarTurno() {
+
+        // Antes de cambiar de turno, verificamos si el jugador actual tiene cartas en la mano y si hay cartas en la mesa.
+        boolean necesitaRepartirJugador = jugadorLaEscobaActual.getCartasEnMano().isEmpty();
+        boolean necesitaRepartirMesa = partida.getMesa().isEmpty();
+
+        // Actualizar la vista: puntajes
+        actualizarPuntaje();
+
+        // Si el jugador actual no tiene cartas, se le reparten 3 cartas
+        if (necesitaRepartirJugador && !partida.getBaraja().getCartas().isEmpty()) {
+            jugadorLaEscobaActual.recibirCartas(partida.getBaraja().repartir(3));
+            Toast.makeText(this, "Se reparten 3 cartas al jugador", Toast.LENGTH_SHORT).show();
+        }
+
+        // Si la mesa está vacía, se reparten 4 cartas para la mesa
+        if (necesitaRepartirMesa && !partida.getBaraja().getCartas().isEmpty()) {
+            for (int i = 0; i < 4; i++) {
+                Carta carta = partida.getBaraja().repartirUna();
+                if (carta != null) {
+                    partida.getMesa().add(carta);
+                }
+            }
+            Toast.makeText(this, "Se reparten 4 cartas a la mesa", Toast.LENGTH_SHORT).show();
+        }
+
         // Alternar entre los jugadores
         int indiceActual = partida.getJugadores().indexOf(jugadorLaEscobaActual);
         jugadorLaEscobaActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
         tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
+
+        // Actualizar la vista: tamaño de la baraja
+        actualizarTamañoBaraja();
+
+        // Verificar si hay jugada disponible
+        boolean jugadaDisponible = partida.jugadaDisponible(jugadorLaEscobaActual);
+        if (jugadaDisponible) {
+            Toast.makeText(this, "Jugada disponible", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Jugada NO disponible", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void seleccionarCarta(Carta cartaSeleccionada) throws NoSuchFieldException, IllegalAccessException {
-        // Ejemplo: jugar la carta seleccionada
+        // jugar la carta seleccionada
         partida.jugarTurno(jugadorLaEscobaActual, cartaSeleccionada, new ArrayList<>());
         actualizarVista();
         cambiarTurno();
@@ -170,7 +197,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
     private void seleccionarCartaMesa(Carta carta, ImageView cartaView) {
         if (cartasSeleccionadasMesa.contains(carta)) {
             cartasSeleccionadasMesa.remove(carta);
-            // aqui es la opacidad seleccionar
+            // aqui se pone la logica para la opacidad de seleccionar
             cartaView.setAlpha(1.0f); // Restaurar opacidad normal
         } else {
             cartasSeleccionadasMesa.add(carta);
@@ -193,15 +220,22 @@ public class JuegoLaEscoba extends AppCompatActivity {
     }
 
     private void actualizarPuntaje() {
-        int puntajeJ1 = partida.getJugadores().get(0).calcularPuntaje();
-        int puntajeJ2 = partida.getJugadores().get(1).calcularPuntaje();
 
-        String puntajeTexto = "Puntaje: " + partida.getJugadores().get(0).getNombre() + " - " + puntajeJ1 +
-                " | " + partida.getJugadores().get(1).getNombre() + " - " + puntajeJ2;
+        String textoPuntaje = "Puntaje: \n ";
 
-        tvPuntaje.setText(puntajeTexto);
+        for (JugadorLaEscoba jugador : partida.getJugadores()) {
+            textoPuntaje += jugador.getNombre() + " - " + jugador.calcularPuntaje() + " | ";
+        }
+
+        tvPuntaje.setText(textoPuntaje);
+
     }
 
+    private void actualizarTamañoBaraja() {
+        // Actualizar el tamaño de la baraja
+        int deckSize = partida.getBaraja().getCartas().size();
+        tvDeckSize.setText("Baraja: " + deckSize);
+    }
 
     private void verificarConexionBD() {
         DatabaseManager dbManager = new DatabaseManager(this);

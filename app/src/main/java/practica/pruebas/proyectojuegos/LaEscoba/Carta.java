@@ -16,7 +16,17 @@ public class Carta {
     }
 
     public int getValor() {
-        return this.valor;
+        // Regla de 10, 11, 12 que valen 2 menos para sumar hasta 15
+        switch (this.valor) {
+            case 10:
+                return 8;
+            case 11:
+                return 9;
+            case 12:
+                return 10;
+            default:
+                return this.valor;
+        }
     }
 
     // Metodo para obtener el ID del recurso de la imagen

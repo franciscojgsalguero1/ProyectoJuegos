@@ -15,12 +15,23 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tvDeckSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Baraja: 0"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/tvPuntaje"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="Puntaje: \n Jugador 1 - 0 | Jugador 2 - 0"
+        android:text=" Error: Lugar donde van los puntos "
         android:textAlignment="center"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -28,18 +39,22 @@
     <TextView
         android:id="@+id/tvMesa"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
+        android:layout_height="78dp"
         android:text="Mesa"
         android:textAlignment="center"
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/mesaCartas"
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"/>
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/mesaCartas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"/>
+    </HorizontalScrollView>
 
     <TextView
         android:id="@+id/tvJugador"
