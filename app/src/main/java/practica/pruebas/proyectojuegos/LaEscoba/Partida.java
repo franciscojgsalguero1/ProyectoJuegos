@@ -105,43 +105,32 @@ public class Partida {
         if (bonusSietes != null) bonusSietes.agregarPuntos(1);
     }
 
-    public boolean jugadaDisponible(JugadorLaEscoba jugadoractual) {
-        ArrayList<Carta> copiaMano = jugadoractual.getCartasEnMano();
-        ArrayList<Carta> copiaMesa = this.mesa;
-        int target = 15;
-        boolean jugadaDisponible = false;
-        int index = mesa.size()-1;
-
-        // ordenamos en orden inverso la copia de las cartas de la mano y la mesa
-        copiaMesa.sort(Comparator.comparingInt(Carta::getValor));
-        Collections.reverse(copiaMesa);
-        copiaMano.sort(Comparator.comparingInt(Carta::getValor));
-        Collections.reverse(copiaMano);
-
-        for (Carta cartamano:copiaMano) {
-            int targetValue = target - cartamano.getValor();
-            for (Carta cartamesa : copiaMesa) {
-                if ( targetValue >= cartamesa.getValor()) {
-                    targetValue -= cartamesa.getValor();
-                }
-            }
-            if (targetValue == 0) {
-                jugadaDisponible = true;
-                break;
-            }
+    private void encontrarCombinacionesHelper(List<Carta> mesa, int target, int index,
+                                              List<Carta> actual, List<List<Carta>> resultados) {
+        if (target == 0 && !actual.isEmpty()) {
+            resultados.add(new ArrayList<>(actual));
+            return;
+        }
+        if (target < 0 || index >= mesa.size()) {
+            return;
         }
 
-        /*do {
-            if (target - copiaMesa.get(index) == target) {
-                jugadaDisponible = true;
-            }
-            index--;
-        } while (!jugadaDisponible && index < copiaMano.size());
-        index = copiaMano.size()-1;
+        // Opción 1: Incluir la carta actual
+        actual.add(mesa.get(index));
+        encontrarCombinacionesHelper(mesa, target - mesa.get(index).getValor(), index + 1, actual, resultados);
+        actual.remove(actual.size() - 1);
 
-        if (!jugadaDisponible) {
-
-        }*/
-        return jugadaDisponible;
+        // Opción 2: Omitir la carta actual
+        encontrarCombinacionesHelper(mesa, target, index + 1, actual, resultados);
     }
+
+    /**
+     * Metodo público que retorna todas las combinaciones de cartas de la mesa que sumen target.
+     */
+    public List<List<Carta>> encontrarCombinaciones(List<Carta> mesa, int target) {
+        List<List<Carta>> resultados = new ArrayList<>();
+        encontrarCombinacionesHelper(mesa, target, 0, new ArrayList<>(), resultados);
+        return resultados;
+    }
+
 }

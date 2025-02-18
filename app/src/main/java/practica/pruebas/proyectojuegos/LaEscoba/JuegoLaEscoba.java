@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import practica.pruebas.proyectojuegos.JugadorGeneral;
 import practica.pruebas.proyectojuegos.R;
@@ -179,12 +180,31 @@ public class JuegoLaEscoba extends AppCompatActivity {
         actualizarTamañoBaraja();
 
         // Verificar si hay jugada disponible
-        boolean jugadaDisponible = partida.jugadaDisponible(jugadorLaEscobaActual);
+
+        boolean jugadaDisponible = existeJugadaDisponibleParaJugador(jugadorLaEscobaActual, partida.getMesa());
         if (jugadaDisponible) {
             Toast.makeText(this, "Jugada disponible", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Jugada NO disponible", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean existeJugadaDisponibleParaJugador(JugadorLaEscoba jugador, List<Carta> mesa) {
+        List<Carta> mano = jugador.getCartasEnMano();
+        if (mano.isEmpty()) {
+            return false;
+        }
+
+        // Para cada carta en la mano, se busca una combinación en la mesa.
+        for (Carta cartaMano : mano) {
+            int target = 15 - cartaMano.getValor();
+            List<List<Carta>> combinacionesValidas = partida.encontrarCombinaciones(mesa, target);
+            if (!combinacionesValidas.isEmpty()) {
+                System.out.println("Jugada encontrada para: " + cartaMano);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void seleccionarCarta(Carta cartaSeleccionada) throws NoSuchFieldException, IllegalAccessException {
