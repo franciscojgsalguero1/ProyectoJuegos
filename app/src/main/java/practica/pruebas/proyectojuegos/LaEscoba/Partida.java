@@ -1,8 +1,11 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
+import android.content.Intent;
+import android.view.View;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -25,9 +28,7 @@ public class Partida {
             jugadorLaEscoba.recibirCartas(baraja.repartir(3));
         }
 
-        for (int i = 0; i < 4; i++) {
-            mesa.add(baraja.repartirUna());
-        }
+        mesa.addAll(baraja.repartir(4));
     }
 
     public Baraja getBaraja() {
@@ -36,6 +37,21 @@ public class Partida {
 
     public ArrayList<Carta> getMesa() {
         return mesa;
+    }
+
+    public void setMesa(ArrayList<Carta> mesa) {
+        this.mesa = mesa;
+    }
+
+    // metodo para vaciar la mesa al final de la partida
+    public void vaciarMesa(JugadorLaEscoba jugador) {
+        if (!this.mesa.isEmpty()) {
+            jugador.setCartasGanadas(this.mesa);
+            for (int i = 0; i < this.mesa.size(); i++) {
+                this.mesa.removeAll(this.mesa);
+            }
+            this.mesa = new ArrayList<>();
+        }
     }
 
     public ArrayList<JugadorLaEscoba> getJugadores() {
@@ -48,11 +64,7 @@ public class Partida {
             cartasGanadas.add(cartaJugador);
             jugadorLaEscoba.ganarCartas(cartasGanadas);
             mesa.removeAll(cartasMesaSeleccionadas);
-
-            if (mesa.isEmpty()) {
-                jugadorLaEscoba.incrementarEscobas();
-                System.out.println(jugadorLaEscoba.getNombre() + " hizo una escoba!");
-            }
+            jugadorLaEscoba.incrementarEscobas(mesa);
         } else {
             mesa.add(cartaJugador);
         }
@@ -133,4 +145,15 @@ public class Partida {
         return resultados;
     }
 
+    public boolean rondaFinalizada(JugadorLaEscoba jugadorLaEscoba) {
+
+        boolean finalizado = false;
+
+        if (jugadores.get(0).getCartasEnMano().isEmpty() && jugadores.get(1).getCartasEnMano().isEmpty() && baraja.getBarajaCartas().isEmpty()) {
+            finalizado = true;
+        }
+
+        // Si la baraja está vacía y todos los jugadores no tienen cartas, la ronda ha finalizado.
+        return finalizado;
+    }
 }

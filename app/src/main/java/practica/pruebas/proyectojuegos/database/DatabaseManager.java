@@ -79,8 +79,38 @@ public class DatabaseManager extends SQLiteOpenHelper {
         values.put(COLUMN_PUNTOS, puntos);
         long id = db.insert(TABLE_PUNTUACIONES, null, values);
         Log.d(TAG, "Insertado registro con ID: " + id);
-        // No es necesario cerrar la base de datos aquí, ya que el helper se encarga de ello.
         return id;
+    }
+
+    /**
+     * Actualiza una puntuación en la tabla.
+     *
+     * @param id      ID del registro a actualizar.
+     * @param jugador Nuevo nombre del jugador.
+     * @param puntos  Nueva puntuación.
+     * @return El número de filas actualizadas.
+     */
+    public int actualizarPuntuacion(int id, String jugador, int puntos) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_JUGADOR, jugador);
+        values.put(COLUMN_PUNTOS, puntos);
+        int filasActualizadas = db.update(TABLE_PUNTUACIONES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        Log.d(TAG, "Filas actualizadas: " + filasActualizadas);
+        return filasActualizadas;
+    }
+
+    /**
+     * Elimina una puntuación de la tabla.
+     *
+     * @param id ID del registro a eliminar.
+     * @return El número de filas eliminadas.
+     */
+    public int eliminarPuntuacion(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int filasEliminadas = db.delete(TABLE_PUNTUACIONES, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        Log.d(TAG, "Filas eliminadas: " + filasEliminadas);
+        return filasEliminadas;
     }
 
     /**
@@ -94,12 +124,17 @@ public class DatabaseManager extends SQLiteOpenHelper {
         return db.rawQuery(query, null);
     }
 
+    /**
+     * Prueba la conexión a la base de datos.
+     *
+     * @return true si la conexión es exitosa, false en caso contrario.
+     */
     public boolean probarConexion() {
         SQLiteDatabase db = null;
         try {
             db = this.getReadableDatabase();
             if (db != null) {
-                return true; // Conexión exitosa
+                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -108,10 +143,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
                 db.close();
             }
         }
-        return false; // Conexión fallida
+        return false;
     }
-
-
-
-    // Puedes agregar métodos adicionales para actualizar, eliminar y consultar registros según tus necesidades.
 }

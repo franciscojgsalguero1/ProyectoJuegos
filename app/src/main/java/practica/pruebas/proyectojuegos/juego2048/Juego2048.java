@@ -3,6 +3,7 @@ package practica.pruebas.proyectojuegos.juego2048;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -36,6 +37,11 @@ public class Juego2048 extends AppCompatActivity {
 
         gridLayout = findViewById(R.id.gridLayout);
         scoreLabel = findViewById(R.id.scoreLabel);
+
+        Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        backToMenuButton.setOnClickListener(v -> {
+            finish();
+        });
 
     }
 

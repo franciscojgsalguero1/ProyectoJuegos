@@ -4,35 +4,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Baraja {
-    private ArrayList<Carta> cartas;
+    private ArrayList<Carta> barajaCartas;
 
     public Baraja() {
-        this.cartas = new ArrayList<>();
+        this.barajaCartas = new ArrayList<>();
         String[] palos = {"clubs", "goblets", "golden", "swords"};
 
         for (String palo : palos) {
             for (int i = 1; i <= 12; i++) {
                 if (i != 8 && i != 9) {
-                    cartas.add(new Carta(palo, i));
+                    barajaCartas.add(new Carta(palo, i));
                 }
             }
         }
-        Collections.shuffle(cartas);
+        Collections.shuffle(barajaCartas);
     }
 
     public ArrayList<Carta> repartir(int cantidad) {
-        ArrayList<Carta> mano = new ArrayList<>();
-        for (int i = 0; i < cantidad && !cartas.isEmpty(); i++) {
-            mano.add(cartas.remove(0));
+        ArrayList<Carta> repartirCartas = new ArrayList<>();
+        for (int i = 0; i < cantidad && !barajaCartas.isEmpty(); i++) {
+            repartirCartas.add(barajaCartas.remove(0));
         }
-        return mano;
+        return repartirCartas;
     }
 
     public Carta repartirUna() {
-        return cartas.isEmpty() ? null : cartas.remove(0);
+        return barajaCartas.isEmpty() ? null : barajaCartas.remove(0);
     }
 
-    public ArrayList<Carta> getCartas() {
-        return cartas;
+    public ArrayList<Carta> getBarajaCartas() {
+        return barajaCartas;
     }
 }
