@@ -1,11 +1,5 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
-import android.content.Intent;
-import android.view.View;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -47,10 +41,7 @@ public class Partida {
     public void vaciarMesa(JugadorLaEscoba jugador) {
         if (!this.mesa.isEmpty()) {
             jugador.setCartasGanadas(this.mesa);
-            for (int i = 0; i < this.mesa.size(); i++) {
-                this.mesa.removeAll(this.mesa);
-            }
-            this.mesa = new ArrayList<>();
+            this.mesa.clear();
         }
     }
 
@@ -83,38 +74,58 @@ public class Partida {
     public void asignarBonificacionesFinales() {
         List<JugadorLaEscoba> jugadores = getJugadores();
 
-        // Bonificación por mayor cantidad de cartas
-        JugadorLaEscoba bonusCartas = Collections.max(jugadores, Comparator.comparingInt(j -> j.getCartasGanadas().size()));
-        bonusCartas.agregarPuntos(1);
+        // Bonus por mayor cantidad de cartas ganadas
+        int maxCartas = -1;
+        JugadorLaEscoba bonusCartas = null;
+        for (JugadorLaEscoba jugador : jugadores) {
+            int cantidadCartas = jugador.getCartasGanadas().size();
+            if (cantidadCartas > maxCartas) {
+                maxCartas = cantidadCartas;
+                bonusCartas = jugador;
+            }
+        }
+        if (bonusCartas != null) {
+            bonusCartas.agregarPuntos(1);
+        }
 
-        // Bonificación por mayor cantidad de oros y sietes
-        JugadorLaEscoba bonusOros = null;
-        JugadorLaEscoba bonusSietes = null;
+        // Bonus por mayor cantidad de oros.
+        // Asumiremos que las cartas de oros son aquellas cuyo palo es "golden" (puedes ajustarlo si usas otro término)
         int maxOros = -1;
-        int maxSietes = -1;
-
+        JugadorLaEscoba bonusOros = null;
         for (JugadorLaEscoba jugador : jugadores) {
             int countOros = 0;
-            int countSietes = 0;
             for (Carta carta : jugador.getCartasGanadas()) {
-                if (carta.getPalo().equalsIgnoreCase("golden") || carta.getPalo().equalsIgnoreCase("golden")) {
+                if (carta.getPalo().equalsIgnoreCase("golden")) {
                     countOros++;
-                }
-                if (carta.getValor() == 7) {
-                    countSietes++;
                 }
             }
             if (countOros > maxOros) {
                 maxOros = countOros;
                 bonusOros = jugador;
             }
+        }
+        if (bonusOros != null) {
+            bonusOros.agregarPuntos(1);
+        }
+
+        // Bonus por mayor cantidad de sietes
+        int maxSietes = -1;
+        JugadorLaEscoba bonusSietes = null;
+        for (JugadorLaEscoba jugador : jugadores) {
+            int countSietes = 0;
+            for (Carta carta : jugador.getCartasGanadas()) {
+                if (carta.getValor() == 7) {
+                    countSietes++;
+                }
+            }
             if (countSietes > maxSietes) {
                 maxSietes = countSietes;
                 bonusSietes = jugador;
             }
         }
-        if (bonusOros != null) bonusOros.agregarPuntos(1);
-        if (bonusSietes != null) bonusSietes.agregarPuntos(1);
+        if (bonusSietes != null) {
+            bonusSietes.agregarPuntos(1);
+        }
     }
 
     private void encontrarCombinacionesHelper(List<Carta> mesa, int target, int index,
@@ -145,11 +156,25 @@ public class Partida {
         return resultados;
     }
 
-    public boolean rondaFinalizada(JugadorLaEscoba jugadorLaEscoba) {
+    public boolean rondaFinalizada() {
 
         boolean finalizado = false;
+        int contador = 0;
 
-        if (jugadores.get(0).getCartasEnMano().isEmpty() && jugadores.get(1).getCartasEnMano().isEmpty() && baraja.getBarajaCartas().isEmpty()) {
+        // por si implementamos la posibilidad de que haya más jugadores
+        for (int i= 0 ; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getCartasEnMano().isEmpty()) {
+                contador++;
+            }
+        }
+
+        if (jugadores.size() == 2 && contador == 1 && baraja.getBarajaCartas().isEmpty() && mesa.isEmpty()) {
+            for (int i = 0; i < jugadores.size(); i++) {
+                mesa.addAll(jugadores.get(i).getCartasEnMano());
+            }
+        }
+
+        if (contador == jugadores.size() && baraja.getBarajaCartas().isEmpty()) {
             finalizado = true;
         }
 

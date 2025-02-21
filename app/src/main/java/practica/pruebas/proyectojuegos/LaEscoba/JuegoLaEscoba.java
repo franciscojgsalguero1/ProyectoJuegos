@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import practica.pruebas.proyectojuegos.R;
-import practica.pruebas.proyectojuegos.database.DatabaseManager;
 
 public class JuegoLaEscoba extends AppCompatActivity {
 
@@ -115,20 +114,25 @@ public class JuegoLaEscoba extends AppCompatActivity {
         boolean cambiarturnobooleano = true;
 
         if (cartaSeleccionadaMano == null) {
+            // si el jugador no selecciona ninguna carta, se le pide que seleccione una carta de su mano
             this.mensajeToast("Selecciona una carta de tu mano");
             cambiarturnobooleano = false;
         } else if (cartaSeleccionadaMano != null && cartasSeleccionadasMesa.isEmpty()) {
+            // si el jugador selecciona una carta de su mano y no ha seleccionado ninguna carta de la mesa, se añade la carta a la mesa
             partida.getMesa().add(cartaSeleccionadaMano);
             jugadorLaEscobaActual.eliminarCartaEnMano(cartaSeleccionadaMano);
         } else if (cartaSeleccionadaMano != null && partida.verificarSuma15(cartaSeleccionadaMano, cartasSeleccionadasMesa)) {
+            // si el jugador selecciona una carta de su mano y ha seleccionado cartas de la mesa, se realiza la jugada
             partida.jugarTurno(jugadorLaEscobaActual, cartaSeleccionadaMano, cartasSeleccionadasMesa);
         } else {
+            // si la jugada no es válida, se pide que seleccione otra jugada
             this.mensajeToast("Las cartas no suman 15");
             cambiarturnobooleano = false;
         }
 
         if (cambiarturnobooleano) {
-            if (partida.rondaFinalizada(jugadorLaEscobaActual)) {
+            // antes del cambio de turno se mira la condición de finalización de la ronda
+            if (partida.rondaFinalizada()) {
                 partida.vaciarMesa(jugadorLaEscobaActual);
                 partida.asignarBonificacionesFinales();
             }
@@ -252,7 +256,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
         jugadorLaEscobaActual.calcularPuntaje();
 
         for (JugadorLaEscoba jugador : partida.getJugadores()) {
-            textoPuntaje += jugador.getNombre() + " - " + jugador.getPuntuacion() + " | ";
+            textoPuntaje += jugador.getNombre() + " - " + jugador.calcularPuntaje() + " | ";
         }
 
         tvPuntaje.setText(textoPuntaje);

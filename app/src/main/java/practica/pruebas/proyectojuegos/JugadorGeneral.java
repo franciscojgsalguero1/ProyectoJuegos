@@ -81,7 +81,7 @@ public class JugadorGeneral {
     // Metodo toString para mostrar la información del jugador
     @Override
     public String toString() {
-        return "Jugador: " + nombre + ", Puntuación: " + puntuacion;
+        return "Jugador: " + this.nombre + ", Puntuación: " + this.puntuacion;
     }
 
     // Callback para devolver el jugador creado

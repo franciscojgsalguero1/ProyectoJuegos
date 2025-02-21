@@ -1,8 +1,8 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
 import java.util.ArrayList;
-
 import practica.pruebas.proyectojuegos.JugadorGeneral;
+import practica.pruebas.proyectojuegos.View;
 
 public class JugadorLaEscoba extends JugadorGeneral {
     //private String nombre;
@@ -34,7 +34,7 @@ public class JugadorLaEscoba extends JugadorGeneral {
     }
 
     public boolean getBaza() {
-        return baza;
+        return this.baza;
     }
 
     public void setBaza(boolean baza) {
@@ -57,7 +57,7 @@ public class JugadorLaEscoba extends JugadorGeneral {
     public void incrementarEscobas(ArrayList<Carta> mesa) {
         if (mesa.isEmpty()) {
             this.escobas++;
-            System.out.println(this.getNombre() + " hizo una escoba!");
+            View.showMessage(this.getNombre() + " hizo una escoba!");
         }
     }
 
@@ -79,25 +79,26 @@ public class JugadorLaEscoba extends JugadorGeneral {
         int cantidadCartas = cartasGanadas.size();
         int cantidadOros = 0;
         int cantidadSietes = 0;
+        int puntos = 0;
+
+        puntos += this.escobas;
 
         for (Carta carta : cartasGanadas) {
             if (carta.getPalo().equalsIgnoreCase("golden")) {
                 cantidadOros++;
-            }
-            if (carta.getValor() == 7) {
-                cantidadSietes++;
-                if (carta.getPalo().equalsIgnoreCase("golden")) {
-                    this.puntos += 1; // ✅ 1 punto si tiene el 7 de oro
+                if (carta.getValor() == 7) {
+                    cantidadSietes++;
+                    puntos += 1; // ✅ 1 punto si tiene el 7 de oro
                 }
             }
         }
 
         // **Reglas de puntuación**:
-        if (cantidadSietes > 0) this.puntos += 1; // ✅ 1 punto si tiene más sietes
-        if (cantidadOros > 0) this.puntos += 1; // ✅ 1 punto si tiene más cartas de oros
-        if (cantidadCartas > 0) this.puntos += 1; // ✅ 1 punto si capturó más cartas
+        if (cantidadSietes > 0) puntos += 1; // ✅ 1 punto si tiene más sietes
+        if (cantidadOros > 0) puntos += 1; // ✅ 1 punto si tiene más cartas de oros
+        if (cantidadCartas > 0) puntos += 1; // ✅ 1 punto si capturó más cartas
 
-        return this.puntos;
+        return puntos;
     }
 
 }
