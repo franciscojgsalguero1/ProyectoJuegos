@@ -2,8 +2,6 @@ package practica.pruebas.proyectojuegos.LaEscoba;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class Partida {
     private ArrayList<JugadorLaEscoba> jugadores;
