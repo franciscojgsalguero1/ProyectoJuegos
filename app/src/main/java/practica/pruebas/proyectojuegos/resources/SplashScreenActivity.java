@@ -1,4 +1,4 @@
-package practica.pruebas.proyectojuegos;
+package practica.pruebas.proyectojuegos.resources;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
@@ -7,9 +7,11 @@ import android.os.Handler;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import practica.pruebas.proyectojuegos.MainActivity;
+import practica.pruebas.proyectojuegos.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 

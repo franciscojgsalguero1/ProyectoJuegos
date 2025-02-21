@@ -15,12 +15,15 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import practica.pruebas.proyectojuegos.OnSwipeTouchListener;
+
+import practica.pruebas.proyectojuegos.resources.JugadorGeneral;
+import practica.pruebas.proyectojuegos.resources.OnSwipeTouchListener;
 
 import practica.pruebas.proyectojuegos.R;
 
 public class Juego2048 extends AppCompatActivity {
 
+    private JugadorGeneral jugador;
     private GridLayout gridLayout;
     private Ficha[][] fichas;
     private static int GRID_SIZE = 4;
@@ -32,9 +35,9 @@ public class Juego2048 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         preguntarTamanoTablero(); // Preguntar el tamaño del tablero
+        jugador = new JugadorGeneral();
 
         setContentView(R.layout.activity_juego2048);
-
         gridLayout = findViewById(R.id.gridLayout);
         scoreLabel = findViewById(R.id.scoreLabel);
 
@@ -394,6 +397,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void finalizarJuego(String mensaje) {
+        //insertarPuntuacion();
         new AlertDialog.Builder(this)
                 .setTitle("Fin del juego")
                 .setMessage(mensaje + "\n¿Quieres jugar de nuevo? \n")

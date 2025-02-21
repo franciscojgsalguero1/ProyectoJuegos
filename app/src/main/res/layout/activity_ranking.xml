@@ -1,28 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Título del Ranking -->
-    <TextView
-        android:id="@+id/tvRankingTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ranking"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:padding="8dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- RecyclerView para mostrar la lista de jugadores y puntuaciones -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rankingRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scrollbars="vertical"/>
+        <!-- Título del Ranking -->
+        <TextView
+            android:id="@+id/tvRankingTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ranking"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="8dp" />
 
-</LinearLayout>
+        <!-- Tabla de ranking -->
+        <TableLayout
+            android:id="@+id/tableRanking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:padding="8dp">
+
+            <!-- Fila de cabecera -->
+            <TableRow>
+                <TextView
+                    android:id="@+id/tvHeaderNombre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/tvHeaderPuntos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Puntos"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+            </TableRow>
+            <!-- Las filas con los datos se añadirán dinámicamente desde RankingActivity -->
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,4 +1,4 @@
-package practica.pruebas.proyectojuegos;
+package practica.pruebas.proyectojuegos.resources;
 
 import android.content.Context;
 import android.view.GestureDetector;

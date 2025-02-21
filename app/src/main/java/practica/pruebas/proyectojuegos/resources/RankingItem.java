@@ -1,4 +1,4 @@
-package practica.pruebas.proyectojuegos;
+package practica.pruebas.proyectojuegos.resources;
 
 public class RankingItem {
     private int posicion;

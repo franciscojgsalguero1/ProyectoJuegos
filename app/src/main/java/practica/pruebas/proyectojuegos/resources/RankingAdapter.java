@@ -1,4 +1,4 @@
-package practica.pruebas.proyectojuegos;
+package practica.pruebas.proyectojuegos.resources;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import practica.pruebas.proyectojuegos.R;
-import practica.pruebas.proyectojuegos.RankingItem;
 
 public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.ViewHolder> {
 

@@ -1,4 +1,4 @@
-package practica.pruebas.proyectojuegos;
+package practica.pruebas.proyectojuegos.resources;
 
 import android.content.Context;
 import android.text.InputType;
@@ -10,6 +10,12 @@ import androidx.appcompat.app.AlertDialog;
 public class JugadorGeneral {
     private String nombre;
     private int puntuacion;
+
+    // Constructor sin puntuación
+    public JugadorGeneral() {
+        this.nombre = "";
+        this.puntuacion = 0;
+    }
 
     // Constructor con puntuación predeterminada
     public JugadorGeneral(String nombre) {

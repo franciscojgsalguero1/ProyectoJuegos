@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import practica.pruebas.proyectojuegos.LaEscoba.JuegoLaEscoba;
 import practica.pruebas.proyectojuegos.juego2048.Juego2048;
+import practica.pruebas.proyectojuegos.resources.JugadorGeneral;
+import practica.pruebas.proyectojuegos.resources.RankingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button startGame2048Button = findViewById(R.id.btn_start_game_2048);
         Button startGameLaEscobaButton = findViewById(R.id.btn_start_game_la_escoba);
+        Button startGameRanking = findViewById(R.id.btn_view_ranking);
 
         startGame2048Button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,9 +47,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        findViewById(R.id.btn_view_ranking).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, RankingActivity.class);
-            startActivity(intent);
+
+        startGameRanking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RankingActivity.class);
+                startActivity(intent);
+            }
         });
 
 
@@ -57,20 +63,17 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        //lo ponemos para las pruebas
-        JugadorGeneral jugadorGeneral = new JugadorGeneral("Jugador 1 pruebas");
-        //lo comentamos para las pruebas
         // Pedir el nombre del jugador
-        /*JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
+        JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
             guardarNombreJugador(jugadorGeneral.getNombre());
-        });*/
+        });
     }
 
-    private String obtenerNombreJugador() {
+    public String obtenerNombreJugador() {
         return getSharedPreferences("jugadorPrefs", MODE_PRIVATE).getString("nombreJugador", "Jugador");
     }
 
-    private void guardarNombreJugador(String nombre) {
+    public void guardarNombreJugador(String nombre) {
         getSharedPreferences("jugadorPrefs", MODE_PRIVATE)
                 .edit()
                 .putString("nombreJugador", nombre)

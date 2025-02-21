@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import practica.pruebas.proyectojuegos.R;
+import practica.pruebas.proyectojuegos.database.DatabaseManager;
 
 public class JuegoLaEscoba extends AppCompatActivity {
 
@@ -24,13 +25,15 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
     private ArrayList<Carta> cartasSeleccionadasMesa = new ArrayList<>();
     private Carta cartaSeleccionadaMano = null;
+    private DatabaseManager dbManager; // Referencia al DatabaseManager
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Inicializamos dbManager
+        dbManager = DatabaseManager.getInstance(this);
         //verificarConexionBD();
         setContentView(R.layout.juegolaescoba);
-
 
         // Inicializar vistas
         tvMesa = findViewById(R.id.tvMesa);
@@ -115,14 +118,17 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
         if (cartaSeleccionadaMano == null) {
             // si el jugador no selecciona ninguna carta, se le pide que seleccione una carta de su mano
+            jugadorLaEscobaActual.setBaza(false);
             this.mensajeToast("Selecciona una carta de tu mano");
             cambiarturnobooleano = false;
         } else if (cartaSeleccionadaMano != null && cartasSeleccionadasMesa.isEmpty()) {
             // si el jugador selecciona una carta de su mano y no ha seleccionado ninguna carta de la mesa, se añade la carta a la mesa
+            jugadorLaEscobaActual.setBaza(false);
             partida.getMesa().add(cartaSeleccionadaMano);
             jugadorLaEscobaActual.eliminarCartaEnMano(cartaSeleccionadaMano);
         } else if (cartaSeleccionadaMano != null && partida.verificarSuma15(cartaSeleccionadaMano, cartasSeleccionadasMesa)) {
             // si el jugador selecciona una carta de su mano y ha seleccionado cartas de la mesa, se realiza la jugada
+            jugadorLaEscobaActual.setBaza(true);
             partida.jugarTurno(jugadorLaEscobaActual, cartaSeleccionadaMano, cartasSeleccionadasMesa);
         } else {
             // si la jugada no es válida, se pide que seleccione otra jugada
@@ -133,8 +139,15 @@ public class JuegoLaEscoba extends AppCompatActivity {
         if (cambiarturnobooleano) {
             // antes del cambio de turno se mira la condición de finalización de la ronda
             if (partida.rondaFinalizada()) {
-                partida.vaciarMesa(jugadorLaEscobaActual);
-                partida.asignarBonificacionesFinales();
+                JugadorLaEscoba jugadorbaza = jugadorLaEscobaActual;
+                for (int i = 0; i < partida.getJugadores().size(); i++) {
+                    if(partida.getJugadores().get(i).getBaza()) {
+                        jugadorbaza = partida.getJugadores().get(i);
+                    }
+                }
+                partida.vaciarMesa(jugadorbaza);
+                JugadorLaEscoba ganador = partida.asignarBonificacionesFinales();
+                dbManager.insertarPuntuacion(ganador.getNombre(), ganador.getPuntuacion());
             }
             cambiarTurno();
         }
@@ -150,6 +163,34 @@ public class JuegoLaEscoba extends AppCompatActivity {
     }
 
     private void cambiarTurno() {
+
+        repartirAntesCanvioTurno();
+
+        // Alternar entre los jugadores
+        int indiceActual = partida.getJugadores().indexOf(jugadorLaEscobaActual);
+        jugadorLaEscobaActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
+        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
+
+        // Actualizar la vista
+        try {
+            actualizarVista();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        // actualizamos el puntuaje de los jugadores
+        actualizarPuntaje();
+
+        // Actualizar la vista: tamaño de la baraja
+        actualizarTamañoBaraja();
+
+        // Verificar si hay jugada disponible
+        if (!existeJugadaDisponibleParaJugador(jugadorLaEscobaActual, partida.getMesa())) {
+            this.mensajeToast("Jugada NO disponible");
+        }
+    }
+
+    public void repartirAntesCanvioTurno() {
 
         // Antes de cambiar de turno, verificamos si el jugador actual tiene cartas en la mano y si hay cartas en la mesa.
         boolean necesitaRepartirJugador = false;
@@ -197,19 +238,6 @@ public class JuegoLaEscoba extends AppCompatActivity {
             this.mensajeToast("Se reparten 4 cartas a la mesa");
         }
 
-        // Alternar entre los jugadores
-        int indiceActual = partida.getJugadores().indexOf(jugadorLaEscobaActual);
-        jugadorLaEscobaActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
-        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
-
-        // Actualizar la vista: tamaño de la baraja
-        actualizarTamañoBaraja();
-
-        // Verificar si hay jugada disponible
-        boolean jugadaDisponible = existeJugadaDisponibleParaJugador(jugadorLaEscobaActual, partida.getMesa());
-        if (!jugadaDisponible) {
-            this.mensajeToast("Jugada NO disponible");
-        }
     }
 
     public boolean existeJugadaDisponibleParaJugador(JugadorLaEscoba jugador, List<Carta> mesa) {
