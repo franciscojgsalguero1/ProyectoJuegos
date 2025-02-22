@@ -1,5 +1,6 @@
 package practica.pruebas.proyectojuegos.juego2048;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
@@ -15,30 +16,37 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import practica.pruebas.proyectojuegos.database.DatabaseManager;
 import practica.pruebas.proyectojuegos.resources.OnSwipeTouchListener;
 
-import practica.pruebas.proyectojuegos.R;
 
+import practica.pruebas.proyectojuegos.R;
 public class Juego2048 extends AppCompatActivity {
 
+    private DatabaseManager dbManager; // Referencia al DatabaseManager
     private GridLayout gridLayout;
     private Ficha[][] fichas;
     private static int GRID_SIZE = 4;
     private int score;
     private TextView scoreLabel;
+    private String playerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Inicializamos dbManager
+        dbManager = DatabaseManager.getInstance(this);
+
         preguntarTamanoTablero(); // Preguntar el tamaño del tablero
-        //jugador = new JugadorGeneral();
+        AskPlayerName();
 
         setContentView(R.layout.activity_juego2048);
         gridLayout = findViewById(R.id.gridLayout);
         scoreLabel = findViewById(R.id.scoreLabel);
-
         Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+
         backToMenuButton.setOnClickListener(v -> {
             finish();
         });
@@ -154,7 +162,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void updateScore(int points) {
-        score += points;
+        this.score += points;
         scoreLabel.setText("Score: " + score);
     }
 
@@ -394,7 +402,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void finalizarJuego(String mensaje) {
-        //insertarPuntuacion();
+        dbManager.insertarPuntuacion(this.playerName, this.score);
         new AlertDialog.Builder(this)
                 .setTitle("Fin del juego")
                 .setMessage(mensaje + "\n¿Quieres jugar de nuevo? \n")
@@ -403,4 +411,38 @@ public class Juego2048 extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+
+    /**
+     * Muestra un diálogo para pedir el nombre del jugador.
+     * Si se introduce un nombre válido, se guarda en la variable nombreJugador y se continúa.
+     */
+
+    private void AskPlayerName() {
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint("Ingresa tu nombre");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Nombre del jugador")
+                .setMessage("Por favor, ingresa tu nombre para jugar 2048:")
+                .setView(input)
+                .setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nombre = input.getText().toString().trim();
+                        if (!nombre.isEmpty()) {
+                            playerName = nombre;
+                            Toast.makeText(Juego2048.this, "¡Bienvenido " + playerName + "!", Toast.LENGTH_SHORT).show();
+                            // Aquí puedes continuar la inicialización del juego
+                        } else {
+                            Toast.makeText(Juego2048.this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                            // Si el nombre es vacío, se vuelve a pedir el nombre
+                            AskPlayerName();
+                        }
+                    }
+                })
+                .show();
+    }
+
 }

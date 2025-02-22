@@ -1,12 +1,16 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
 
     private Partida partida;
     private JugadorLaEscoba jugadorLaEscobaActual;
+    private ArrayList<JugadorLaEscoba> jugadores;
     private LinearLayout mesaCartasLayout, cartasJugadorLayout;
     private TextView tvMesa, tvJugador, tvPuntaje, tvDeckSize;
     private Button btnJugar;
@@ -47,16 +52,16 @@ public class JuegoLaEscoba extends AppCompatActivity {
         backToMenuButton.setOnClickListener(v -> {finish();});
 
         // Configurar partida
-        ArrayList<JugadorLaEscoba> jugadores = new ArrayList<>();
+        jugadores = new ArrayList<>();
         int numeroJugadores = 2;
         for (int i = 1; i < numeroJugadores+1; i++) {
             // Pedir nombre al jugador
-            JugadorLaEscoba jugador = new JugadorLaEscoba("nuevo jugador La Escoba" + i);
-                jugadores.add(jugador);
+            JugadorLaEscoba jugador = new JugadorLaEscoba("jugador La Escoba" + i);
+            jugadores.add(jugador);
         }
         partida = new Partida(jugadores);
         jugadorLaEscobaActual = jugadores.get(0);
-        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
+        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getPlayerName());
 
         // Mostrar cartas iniciales
         try {
@@ -64,8 +69,6 @@ public class JuegoLaEscoba extends AppCompatActivity {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-
-
 
         // Acción del botón Jugar
         btnJugar.setOnClickListener(v -> realizarJugadaSeleccionada());
@@ -148,7 +151,8 @@ public class JuegoLaEscoba extends AppCompatActivity {
                 }
                 partida.vaciarMesa(jugadorbaza);
                 JugadorLaEscoba ganador = partida.asignarBonificacionesFinales();
-                dbManager.insertarPuntuacion(ganador.getNombre(), ganador.getPuntos());
+                ganador.agregarPuntos(ganador.score);
+                dbManager.insertarPuntuacion(ganador.getPlayerName(), ganador.getScore());
             }
             cambiarTurno();
         }
@@ -170,7 +174,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
         // Alternar entre los jugadores
         int indiceActual = partida.getJugadores().indexOf(jugadorLaEscobaActual);
         jugadorLaEscobaActual = partida.getJugadores().get((indiceActual + 1) % partida.getJugadores().size());
-        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getNombre());
+        tvJugador.setText("Mano: " + jugadorLaEscobaActual.getPlayerName());
 
         // Actualizar la vista
         try {
@@ -211,6 +215,18 @@ public class JuegoLaEscoba extends AppCompatActivity {
             }
         }
 
+        // Si la mesa está vacía, se reparten 4 cartas para la mesa
+        if (necesitaRepartirMesa && !partida.getBaraja().getBarajaCartas().isEmpty()) {
+            int numeroCartasRepartir = 4;
+            if (partida.getBaraja().getBarajaCartas().size() < 4) {
+                numeroCartasRepartir = partida.getBaraja().getBarajaCartas().size();
+            }
+            for (int i = 0; i < numeroCartasRepartir; i++) {
+                partida.getMesa().add(partida.getBaraja().repartirUna());
+            }
+            this.mensajeToast("Se reparten "+ numeroCartasRepartir +" cartas a la mesa");
+        }
+
         // Si los jugadores tienen cartas, se le reparten 3 cartas a cada uno
         if (necesitaRepartirJugador && !partida.getBaraja().getBarajaCartas().isEmpty()) {
 
@@ -226,17 +242,6 @@ public class JuegoLaEscoba extends AppCompatActivity {
                     jugador.recibirCartas(partida.getBaraja().repartir(1));
                 }
             }
-        }
-
-        // Si la mesa está vacía, se reparten 4 cartas para la mesa
-        if (necesitaRepartirMesa && !partida.getBaraja().getBarajaCartas().isEmpty()) {
-            for (int i = 0; i < 4; i++) {
-                Carta carta = partida.getBaraja().repartirUna();
-                if (carta != null) {
-                    partida.getMesa().add(carta);
-                }
-            }
-            this.mensajeToast("Se reparten 4 cartas a la mesa");
         }
 
     }
@@ -285,7 +290,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
         jugadorLaEscobaActual.calcularPuntaje();
 
         for (JugadorLaEscoba jugador : partida.getJugadores()) {
-            textoPuntaje += jugador.getNombre() + " - " + jugador.calcularPuntaje() + " | ";
+            textoPuntaje += jugador.getPlayerName() + " - " + jugador.calcularPuntaje() + " | ";
         }
 
         tvPuntaje.setText(textoPuntaje);
@@ -295,6 +300,36 @@ public class JuegoLaEscoba extends AppCompatActivity {
         // Actualizar el tamaño de la baraja
         int deckSize = partida.getBaraja().getBarajaCartas().size();
         tvDeckSize.setText("Baraja: " + deckSize);
+    }
+
+    private JugadorLaEscoba askPlayerName() {
+        EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint("Ingresa tu nombre");
+        final JugadorLaEscoba[] jugador = new JugadorLaEscoba[1];
+
+        new AlertDialog.Builder(this)
+                .setTitle("Nombre del jugador")
+                .setMessage("Por favor, ingresa tu nombre para jugar a La Escoba:")
+                .setView(input)
+                .setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String playerName = input.getText().toString().trim();
+                        if (!playerName.isEmpty()) {
+                            jugador[0] = new JugadorLaEscoba(playerName);
+                            Toast.makeText(JuegoLaEscoba.this, "¡Bienvenido " + jugador[0].getPlayerName() + "!", Toast.LENGTH_SHORT).show();
+                            // Aquí puedes continuar la inicialización del juego
+                        } else {
+                            Toast.makeText(JuegoLaEscoba.this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                            // Si el nombre es vacío, se vuelve a pedir el nombre
+                            askPlayerName();
+                        }
+                    }
+                })
+                .show();
+        return jugador[0];
     }
 
     public void mensajeToast(String mensaje) {

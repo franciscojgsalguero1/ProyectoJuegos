@@ -83,22 +83,18 @@ public class Partida {
                     if (carta.getValor() == 7) {
                         jugador.agregarPuntos(1);
                     }
-                }
-                if (carta.getValor() == 7) {
+                }else if (carta.getValor() == 7) {
                     jugador.setCantidadSietes(jugador.getCantidadSietes()+1);
                 }
             }
+            jugador.agregarPuntos(jugador.getescobas());
         }
 
         Collections.max(jugadores, Comparator.comparingInt(JugadorLaEscoba::getCantidadOros)).agregarPuntos(1);
         Collections.max(jugadores, Comparator.comparingInt(JugadorLaEscoba::getCantidadSietes)).agregarPuntos(1);
 
-        /*for (JugadorLaEscoba jugador: jugadores) {
-            JugadorLaEscoba jugadorGanador = jugador;
-        }*/
-
         for (JugadorLaEscoba jugador: jugadores) {
-            if (ganador.getPuntos() < jugador.getPuntos()) {
+            if (ganador.getScore() < jugador.getScore()) {
                 ganador = jugador;
             }
         }

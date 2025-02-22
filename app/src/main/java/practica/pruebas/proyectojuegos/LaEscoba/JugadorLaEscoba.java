@@ -1,45 +1,39 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.text.InputType;
-import android.widget.EditText;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 import practica.pruebas.proyectojuegos.resources.View;
 
 public class JugadorLaEscoba {
-    private String nombre;
+    private String playerName;
     private ArrayList<Carta> cartasEnMano;
     private ArrayList<Carta> cartasGanadas;
     private int cantidadOros;
     private int cantidadSietes;
     private int escobas;
     private boolean baza;
-    int puntos;
+    int score;
 
-    public JugadorLaEscoba(String nombre) {
-        this.nombre = nombre;
+    public JugadorLaEscoba(String playerName) {
+        this.playerName = playerName;
         this.cartasEnMano = new ArrayList<>();
         this.cartasGanadas = new ArrayList<>();
         this.cantidadOros = 0;
         this.cantidadSietes = 0;
         this.escobas = 0;
         this.baza = false;
-        this.puntos = 0;
+        this.score = 0;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
-    public int getPuntos() {
-        return this.puntos;
+    public int getScore() {
+        return this.score;
     }
 
     public ArrayList<Carta> getCartasEnMano() {
@@ -91,19 +85,23 @@ public class JugadorLaEscoba {
         cartasEnMano.removeIf(c -> c.getPalo().equals(carta.getPalo()) && c.getValor() == carta.getValor());
     }
 
-    public void setPuntos(int puntos) {
-        this.puntos = puntos;
+    public void setScore(int score) {
+        this.score = score;
     }
+
+    public int getescobas() { return escobas; }
 
     public void incrementarEscobas(ArrayList<Carta> mesa) {
         if (mesa.isEmpty()) {
             this.escobas++;
-            View.showMessage(this.getNombre() + " hizo una escoba!");
+            View.showMessage(this.getPlayerName() + " hizo una escoba!");
         }
     }
 
     // Permite agregar puntos directos (por bonificaciones comparativas)
-    public void agregarPuntos(int puntos) {}
+    public void agregarPuntos(int score) {
+        this.score += score;
+    }
 
     /**
      * Calcula la puntuación individual del jugador basada en:
