@@ -402,7 +402,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void finalizarJuego(String mensaje) {
-        dbManager.insertarPuntuacion(this.playerName, this.score);
+        dbManager.insertarOActualizarPuntuacion(this.playerName, this.score);
         new AlertDialog.Builder(this)
                 .setTitle("Fin del juego")
                 .setMessage(mensaje + "\n¿Quieres jugar de nuevo? \n")

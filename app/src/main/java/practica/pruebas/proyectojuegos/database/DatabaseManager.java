@@ -75,4 +75,40 @@ public class DatabaseManager extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_PUNTUACIONES + " ORDER BY " + COLUMN_PUNTOS + " DESC";
         return db.rawQuery(query, null);
     }
+
+    public void insertarOActualizarPuntuacion(String jugador, int puntos) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Consultamos si ya existe un registro para este jugador
+        Cursor cursor = db.query(TABLE_PUNTUACIONES,
+                new String[]{COLUMN_ID, COLUMN_PUNTOS},
+                COLUMN_JUGADOR + " = ?",
+                new String[]{jugador},
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            // Existe un registro para este jugador
+            int puntuacionExistente = cursor.getInt(cursor.getColumnIndex(COLUMN_PUNTOS));
+            int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+            // Si la nueva puntuación es mayor, actualizamos el registro
+            if (puntos > puntuacionExistente) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_PUNTOS, puntos);
+                int filasActualizadas = db.update(TABLE_PUNTUACIONES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+                Log.d(TAG, "Se actualizaron " + filasActualizadas + " filas para el jugador: " + jugador);
+            }
+        } else {
+            // No existe registro para este jugador, se inserta uno nuevo
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_JUGADOR, jugador);
+            values.put(COLUMN_PUNTOS, puntos);
+            long idInsertado = db.insert(TABLE_PUNTUACIONES, null, values);
+            Log.d(TAG, "Se insertó el registro con ID: " + idInsertado + " para el jugador: " + jugador);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
 }

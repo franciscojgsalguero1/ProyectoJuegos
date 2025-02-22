@@ -152,7 +152,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
                 partida.vaciarMesa(jugadorbaza);
                 JugadorLaEscoba ganador = partida.asignarBonificacionesFinales();
                 ganador.agregarPuntos(ganador.score);
-                dbManager.insertarPuntuacion(ganador.getPlayerName(), ganador.getScore());
+                dbManager.insertarOActualizarPuntuacion(ganador.getPlayerName(), ganador.getScore());
             }
             cambiarTurno();
         }
