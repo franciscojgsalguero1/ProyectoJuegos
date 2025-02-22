@@ -1,28 +1,45 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
-import practica.pruebas.proyectojuegos.resources.JugadorGeneral;
 import practica.pruebas.proyectojuegos.resources.View;
 
-public class JugadorLaEscoba extends JugadorGeneral {
-    //private String nombre;
+public class JugadorLaEscoba {
+    private String nombre;
     private ArrayList<Carta> cartasEnMano;
     private ArrayList<Carta> cartasGanadas;
     private int cantidadOros;
     private int cantidadSietes;
     private int escobas;
     private boolean baza;
-    private int puntos;
+    int puntos;
 
     public JugadorLaEscoba(String nombre) {
-        super(nombre);
+        this.nombre = nombre;
         this.cartasEnMano = new ArrayList<>();
         this.cartasGanadas = new ArrayList<>();
         this.cantidadOros = 0;
         this.cantidadSietes = 0;
-        this.puntos = 0;
         this.escobas = 0;
         this.baza = false;
+        this.puntos = 0;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public int getPuntos() {
+        return this.puntos;
     }
 
     public ArrayList<Carta> getCartasEnMano() {
@@ -45,24 +62,8 @@ public class JugadorLaEscoba extends JugadorGeneral {
         return cantidadSietes;
     }
 
-    public int getPuntos() {
-        return puntos;
-    }
-
-    public int getEscobas() {
-        return escobas;
-    }
-
     public boolean getBaza() {
         return this.baza;
-    }
-
-    public void setEscobas(int escobas) {
-        this.escobas = escobas;
-    }
-
-    public void setPuntos(int puntos) {
-        this.puntos = puntos;
     }
 
     public void setCantidadOros(int cantidadOros) {
@@ -90,6 +91,10 @@ public class JugadorLaEscoba extends JugadorGeneral {
         cartasEnMano.removeIf(c -> c.getPalo().equals(carta.getPalo()) && c.getValor() == carta.getValor());
     }
 
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
+    }
+
     public void incrementarEscobas(ArrayList<Carta> mesa) {
         if (mesa.isEmpty()) {
             this.escobas++;
@@ -98,9 +103,7 @@ public class JugadorLaEscoba extends JugadorGeneral {
     }
 
     // Permite agregar puntos directos (por bonificaciones comparativas)
-    public void agregarPuntos(int puntos) {
-        this.puntos += puntos;
-    }
+    public void agregarPuntos(int puntos) {}
 
     /**
      * Calcula la puntuación individual del jugador basada en:

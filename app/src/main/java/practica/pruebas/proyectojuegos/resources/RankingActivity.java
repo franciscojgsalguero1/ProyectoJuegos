@@ -2,6 +2,7 @@ package practica.pruebas.proyectojuegos.resources;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -28,6 +29,9 @@ public class RankingActivity extends AppCompatActivity {
 
         // Obtenemos el TableLayout del layout activity_ranking.xml
         tableRanking = findViewById(R.id.tableRanking);
+        // aquí implementariamos un boton para volver al menu principal
+        //Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        //backToMenuButton.setOnClickListener(v -> {finish();});
 
         // Cargamos los datos del ranking
         cargarRanking();

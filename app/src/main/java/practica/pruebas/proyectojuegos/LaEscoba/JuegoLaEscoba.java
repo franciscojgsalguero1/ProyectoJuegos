@@ -49,9 +49,10 @@ public class JuegoLaEscoba extends AppCompatActivity {
         // Configurar partida
         ArrayList<JugadorLaEscoba> jugadores = new ArrayList<>();
         int numeroJugadores = 2;
-        for (int i = 0; i < numeroJugadores; i++) {
-            String nombreJugador = "Jugador " + (i + 1);
-            jugadores.add(new JugadorLaEscoba(nombreJugador));
+        for (int i = 1; i < numeroJugadores+1; i++) {
+            // Pedir nombre al jugador
+            JugadorLaEscoba jugador = new JugadorLaEscoba("nuevo jugador La Escoba" + i);
+                jugadores.add(jugador);
         }
         partida = new Partida(jugadores);
         jugadorLaEscobaActual = jugadores.get(0);
@@ -147,7 +148,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
                 }
                 partida.vaciarMesa(jugadorbaza);
                 JugadorLaEscoba ganador = partida.asignarBonificacionesFinales();
-                dbManager.insertarPuntuacion(ganador.getNombre(), ganador.getPuntuacion());
+                dbManager.insertarPuntuacion(ganador.getNombre(), ganador.getPuntos());
             }
             cambiarTurno();
         }

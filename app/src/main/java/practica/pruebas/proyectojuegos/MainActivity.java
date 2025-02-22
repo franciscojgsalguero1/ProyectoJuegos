@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import practica.pruebas.proyectojuegos.LaEscoba.JuegoLaEscoba;
 import practica.pruebas.proyectojuegos.juego2048.Juego2048;
-import practica.pruebas.proyectojuegos.resources.JugadorGeneral;
 import practica.pruebas.proyectojuegos.resources.RankingActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,21 +61,5 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        // Pedir el nombre del jugador
-        JugadorGeneral.pedirNombre(this, jugadorGeneral -> {
-            guardarNombreJugador(jugadorGeneral.getNombre());
-        });
-    }
-
-    public String obtenerNombreJugador() {
-        return getSharedPreferences("jugadorPrefs", MODE_PRIVATE).getString("nombreJugador", "Jugador");
-    }
-
-    public void guardarNombreJugador(String nombre) {
-        getSharedPreferences("jugadorPrefs", MODE_PRIVATE)
-                .edit()
-                .putString("nombreJugador", nombre)
-                .apply();
     }
 }

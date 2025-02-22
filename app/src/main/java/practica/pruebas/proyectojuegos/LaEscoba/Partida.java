@@ -1,14 +1,9 @@
 package practica.pruebas.proyectojuegos.LaEscoba;
 
-import android.database.Cursor;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import practica.pruebas.proyectojuegos.MainActivity;
-import practica.pruebas.proyectojuegos.database.DatabaseManager;
 
 public class Partida {
     private ArrayList<JugadorLaEscoba> jugadores;
