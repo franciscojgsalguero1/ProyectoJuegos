@@ -1,9 +1,11 @@
 package practica.pruebas.proyectojuegos;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +19,11 @@ import practica.pruebas.proyectojuegos.resources.RankingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ImageView imgJuego2048;
+    private ImageView imgJuegoLaEscoba;
+    private ImageView imgJuegoRanking;
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,19 +34,21 @@ public class MainActivity extends AppCompatActivity {
         text.setAlpha(0);
         text.animate().alpha(1).setDuration(2000);
 
-        Button startGame2048Button = findViewById(R.id.btn_start_game_2048);
-        Button startGameLaEscobaButton = findViewById(R.id.btn_start_game_la_escoba);
-        Button startGameRanking = findViewById(R.id.btn_view_ranking);
+        imgJuego2048 = findViewById(R.id.imgJuego2048);
+        imgJuegoLaEscoba = findViewById(R.id.imgJuegoLaEscoba);
+        imgJuegoRanking = findViewById(R.id.imgRanking);
 
-        startGame2048Button.setOnClickListener(new View.OnClickListener() {
+        //Button startGame2048Button = findViewById(R.id.btn_start_game_2048);
+        //Button startGameLaEscobaButton = findViewById(R.id.btn_start_game_la_escoba);
+        // Asignar listener a la imagen del juego 2048
+        imgJuego2048.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, Juego2048.class);
                 startActivity(intent);
             }
         });
-
-        startGameLaEscobaButton.setOnClickListener(new View.OnClickListener() {
+        imgJuegoLaEscoba.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, JuegoLaEscoba.class);
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startGameRanking.setOnClickListener(new View.OnClickListener() {
+        imgJuegoRanking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RankingActivity.class);

@@ -2,6 +2,7 @@ package practica.pruebas.proyectojuegos.juego2048;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.view.Gravity;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import android.widget.Chronometer;
 
 import practica.pruebas.proyectojuegos.database.DatabaseManager;
 import practica.pruebas.proyectojuegos.resources.OnSwipeTouchListener;
@@ -31,6 +33,7 @@ public class Juego2048 extends AppCompatActivity {
     private int score;
     private TextView scoreLabel;
     private String playerName;
+    private Chronometer chronometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,10 @@ public class Juego2048 extends AppCompatActivity {
         gridLayout = findViewById(R.id.gridLayout);
         scoreLabel = findViewById(R.id.scoreLabel);
         Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        chronometer = findViewById(R.id.chronometer);
+        // Establece la base del cronómetro al tiempo actual
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
 
         backToMenuButton.setOnClickListener(v -> {
             finish();
@@ -362,8 +369,12 @@ public class Juego2048 extends AppCompatActivity {
     private void verificarEstadoJuego() {
         if (checkVictory()) {
             finalizarJuego("¡Has ganado!");
+            long tiempoJugado = SystemClock.elapsedRealtime() - chronometer.getBase();
+            dbManager.insertarPuntuacion(this.playerName, this.score, tiempoJugado);
         } else if (checkGameOver()) {
             finalizarJuego("No hay movimientos posibles. ¡Has perdido!");
+            long tiempoJugado = SystemClock.elapsedRealtime() - chronometer.getBase();
+            dbManager.insertarPuntuacion(this.playerName, this.score, tiempoJugado);
         }
     }
 
@@ -402,7 +413,9 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void finalizarJuego(String mensaje) {
-        dbManager.insertarOActualizarPuntuacion(this.playerName, this.score);
+        chronometer.stop();
+
+
         new AlertDialog.Builder(this)
                 .setTitle("Fin del juego")
                 .setMessage(mensaje + "\n¿Quieres jugar de nuevo? \n")

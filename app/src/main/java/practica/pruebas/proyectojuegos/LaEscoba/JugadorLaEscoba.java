@@ -28,10 +28,6 @@ public class JugadorLaEscoba {
         return playerName;
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
     public int getScore() {
         return this.score;
     }
@@ -85,10 +81,6 @@ public class JugadorLaEscoba {
         cartasEnMano.removeIf(c -> c.getPalo().equals(carta.getPalo()) && c.getValor() == carta.getValor());
     }
 
-    public void setScore(int score) {
-        this.score = score;
-    }
-
     public int getescobas() { return escobas; }
 
     public void incrementarEscobas(ArrayList<Carta> mesa) {
@@ -137,5 +129,4 @@ public class JugadorLaEscoba {
 
         return puntos;
     }
-
 }

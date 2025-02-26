@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Chronometer;
 
 public class DatabaseManager extends SQLiteOpenHelper {
 
@@ -19,6 +20,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
     public static final String COLUMN_JUGADOR = "jugador";
     public static final String COLUMN_PUNTOS = "puntos";
     public static final String COLUMN_FECHA = "fecha";
+    public static final String COLUMN_TIEMPO = "tiempo";
 
     // Instancia Singleton para evitar múltiples conexiones a la BD
     private static DatabaseManager instance;
@@ -43,6 +45,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_JUGADOR + " TEXT NOT NULL, "
                 + COLUMN_PUNTOS + " INTEGER NOT NULL, "
+                + COLUMN_TIEMPO + " INTEGER NOT NULL, "
                 + COLUMN_FECHA + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
                 + ");";
         db.execSQL(createTable);
@@ -58,57 +61,51 @@ public class DatabaseManager extends SQLiteOpenHelper {
         Log.d(TAG, "Base de datos actualizada de versión " + oldVersion + " a " + newVersion);
     }
 
-    // Ejemplo de Metodo para insertar una puntuación
-    public long insertarPuntuacion(String jugador, int puntos) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_JUGADOR, jugador);
-        values.put(COLUMN_PUNTOS, puntos);
-        long id = db.insert(TABLE_PUNTUACIONES, null, values);
-        Log.d(TAG, "Insertado registro con ID: " + id);
-        return id;
-    }
-
     // Ejemplo de Metodo para obtener un Cursor con los jugadores ordenados por puntos en forma descendente
-    public Cursor obtenerJugadores() {
+    public Cursor obtenerJugadores(boolean orden, boolean maximo) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_PUNTUACIONES + " ORDER BY " + COLUMN_PUNTOS + " DESC";
+        String ordenacion = COLUMN_PUNTOS + " DESC";
+        if (orden) {
+            ordenacion = COLUMN_JUGADOR + " ASC";
+        }
+        if (maximo) {
+            ordenacion += " LIMIT 10";
+        }
+        String query = "SELECT * FROM " + TABLE_PUNTUACIONES + " ORDER BY " + ordenacion ;
         return db.rawQuery(query, null);
     }
 
-    public void insertarOActualizarPuntuacion(String jugador, int puntos) {
+    public void insertarPuntuacion(String jugador, int puntos, Long tiempo) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Consultamos si ya existe un registro para este jugador
+        // Opcional: consultar si ya existe un registro para este jugador.
         Cursor cursor = db.query(TABLE_PUNTUACIONES,
                 new String[]{COLUMN_ID, COLUMN_PUNTOS},
                 COLUMN_JUGADOR + " = ?",
                 new String[]{jugador},
                 null, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            // Existe un registro para este jugador
-            int puntuacionExistente = cursor.getInt(cursor.getColumnIndex(COLUMN_PUNTOS));
-            int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
-            // Si la nueva puntuación es mayor, actualizamos el registro
-            if (puntos > puntuacionExistente) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_PUNTOS, puntos);
-                int filasActualizadas = db.update(TABLE_PUNTUACIONES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
-                Log.d(TAG, "Se actualizaron " + filasActualizadas + " filas para el jugador: " + jugador);
-            }
-        } else {
-            // No existe registro para este jugador, se inserta uno nuevo
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_JUGADOR, jugador);
-            values.put(COLUMN_PUNTOS, puntos);
-            long idInsertado = db.insert(TABLE_PUNTUACIONES, null, values);
-            Log.d(TAG, "Se insertó el registro con ID: " + idInsertado + " para el jugador: " + jugador);
-        }
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_JUGADOR, jugador);
+        values.put(COLUMN_PUNTOS, puntos);
+        values.put(COLUMN_TIEMPO, tiempo);
+
+        // Inserta el registro (o bien podrías actualizar si ya existe, según tu lógica)
+        long idInsertado = db.insert(TABLE_PUNTUACIONES, null, values);
+        Log.d(TAG, "Se insertó el registro con ID: " + idInsertado + " para el jugador: " + jugador);
 
         if (cursor != null) {
             cursor.close();
         }
+    }
+
+
+    public int vaciarRanking() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Elimina todos los registros de la tabla sin condiciones
+        int filasEliminadas = db.delete(TABLE_PUNTUACIONES, null, null);
+        Log.d(TAG, "Se han eliminado " + filasEliminadas + " registros del ranking.");
+        return filasEliminadas;
     }
 
 }

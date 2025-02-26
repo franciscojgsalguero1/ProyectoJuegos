@@ -36,18 +36,47 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nombre"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:padding="8dp"/>
+
                 <TextView
                     android:id="@+id/tvHeaderPuntos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="8dp"
                     android:text="Puntos"
-                    android:textStyle="bold"
-                    android:padding="8dp"/>
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHeaderTiempo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Tiempo"
+                    android:textStyle="bold" />
             </TableRow>
             <!-- Las filas con los datos se añadirán dinámicamente desde RankingActivity -->
         </TableLayout>
+
+        <!-- Botón para eliminar (vaciar) el ranking -->
+        <Button
+            android:id="@+id/btnEliminarRanking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eliminar Ranking"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/btn_back_to_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="32dp"
+            android:text="Back to Menu" />
 
     </LinearLayout>
 </ScrollView>

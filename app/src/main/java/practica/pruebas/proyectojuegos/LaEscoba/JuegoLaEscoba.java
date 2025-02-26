@@ -2,8 +2,10 @@ package practica.pruebas.proyectojuegos.LaEscoba;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +21,7 @@ import java.util.List;
 import practica.pruebas.proyectojuegos.R;
 import practica.pruebas.proyectojuegos.database.DatabaseManager;
 
+
 public class JuegoLaEscoba extends AppCompatActivity {
 
     private Partida partida;
@@ -31,6 +34,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
     private ArrayList<Carta> cartasSeleccionadasMesa = new ArrayList<>();
     private Carta cartaSeleccionadaMano = null;
     private DatabaseManager dbManager; // Referencia al DatabaseManager
+    private Chronometer chronometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,11 @@ public class JuegoLaEscoba extends AppCompatActivity {
         btnJugar = findViewById(R.id.btnJugar);
         Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
         backToMenuButton.setOnClickListener(v -> {finish();});
+
+        chronometer = findViewById(R.id.chronometer);
+        // Establece la base del cronómetro al tiempo actual
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
 
         // Configurar partida
         jugadores = new ArrayList<>();
@@ -152,7 +161,9 @@ public class JuegoLaEscoba extends AppCompatActivity {
                 partida.vaciarMesa(jugadorbaza);
                 JugadorLaEscoba ganador = partida.asignarBonificacionesFinales();
                 ganador.agregarPuntos(ganador.score);
-                dbManager.insertarOActualizarPuntuacion(ganador.getPlayerName(), ganador.getScore());
+                actualizarPuntaje();
+                chronometer.stop();
+                dbManager.insertarPuntuacion(ganador.getPlayerName(), ganador.getScore(), chronometer.getBase());
             }
             cambiarTurno();
         }
@@ -255,7 +266,7 @@ public class JuegoLaEscoba extends AppCompatActivity {
             int target = 15 - cartaMano.getValor();
             List<List<Carta>> combinacionesValidas = partida.encontrarCombinaciones(mesa, target);
             if (!combinacionesValidas.isEmpty()) {
-                System.out.println("Jugada encontrada para: " + cartaMano);
+                //Toast.makeText(JuegoLaEscoba.this, "Jugada encontrada para: " + cartaMano, Toast.LENGTH_SHORT).show();
                 jugada = true;
             }
         }
