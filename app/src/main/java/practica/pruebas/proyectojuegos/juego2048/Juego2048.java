@@ -29,6 +29,7 @@ public class Juego2048 extends AppCompatActivity {
     private DatabaseManager dbManager; // Referencia al DatabaseManager
     private GridLayout gridLayout;
     private Ficha[][] fichas;
+    private Ficha[][] turnoAnterior;
     private static int GRID_SIZE = 4;
     private int score;
     private TextView scoreLabel;
@@ -49,6 +50,7 @@ public class Juego2048 extends AppCompatActivity {
         gridLayout = findViewById(R.id.gridLayout);
         scoreLabel = findViewById(R.id.scoreLabel);
         Button backToMenuButton = findViewById(R.id.btn_back_to_menu);
+        Button turnComeback = findViewById(R.id.btn_turn_comeback);
         chronometer = findViewById(R.id.chronometer);
         // Establece la base del cronómetro al tiempo actual
         chronometer.setBase(SystemClock.elapsedRealtime());
@@ -56,6 +58,20 @@ public class Juego2048 extends AppCompatActivity {
 
         backToMenuButton.setOnClickListener(v -> {
             finish();
+        });
+
+        turnComeback.setOnClickListener(v -> {
+            if (turnoAnterior != null) {
+                for (int i = 0; i < GRID_SIZE; i++) {
+                    for (int j = 0; j < GRID_SIZE; j++) {
+                        fichas[i][j].setValor(turnoAnterior[i][j].getValor());
+                        updateFichaView(fichas[i][j]);
+                    }
+                }
+                Toast.makeText(this, "Turno restaurado", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "No hay un turno anterior guardado.", Toast.LENGTH_SHORT).show();
+            }
         });
 
     }
@@ -78,6 +94,7 @@ public class Juego2048 extends AppCompatActivity {
                         // Validar que el tamaño esté en el rango permitido
                         if (tamano >= 3 && tamano <= 8) {
                             GRID_SIZE = tamano; // Establecer el tamaño del tablero
+
                             iniciarJuego(); // Llamar al metodo para inicializar el tablero
                         } else {
                             Toast.makeText(this, "El tamaño debe estar entre 3 y 8.", Toast.LENGTH_SHORT).show();
@@ -123,6 +140,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void addFichaToGrid(Ficha ficha) {
+
         TextView tile = new TextView(this);
         tile.setGravity(Gravity.CENTER);
         tile.setTextSize(24);
@@ -137,6 +155,7 @@ public class Juego2048 extends AppCompatActivity {
         params.setMargins(8, 8, 8, 8);
 
         gridLayout.addView(tile, params);
+
     }
 
     private void updateFichaView(Ficha ficha) {
@@ -201,21 +220,19 @@ public class Juego2048 extends AppCompatActivity {
         });
     }
 
-
     public void moveUp() {
-        boolean moved = false; // Para saber si se hizo algún movimiento
+        guardarEstadoAnterior(); // Guardar el turno antes de mover
 
+        boolean moved = false;
         for (int col = 0; col < GRID_SIZE; col++) {
-            for (int row = 1; row < GRID_SIZE; row++) { // Empezamos desde la segunda fila
+            for (int row = 1; row < GRID_SIZE; row++) {
                 if (fichas[row][col].getValor() != 0) {
                     int targetRow = row;
-
-                    // Buscar la posición más arriba donde pueda moverse
                     for (int nextRow = row - 1; nextRow >= 0; nextRow--) {
                         if (fichas[nextRow][col].getValor() == 0) {
-                            targetRow = nextRow; // Mover hacia arriba
+                            targetRow = nextRow;
                         } else if (fichas[nextRow][col].getValor() == fichas[row][col].getValor() && !fichas[nextRow][col].isMerged()) {
-                            targetRow = nextRow; // Fusionar
+                            targetRow = nextRow;
                             updateScore(fichas[row][col].getValor() * 2);
                             break;
                         } else {
@@ -224,7 +241,6 @@ public class Juego2048 extends AppCompatActivity {
                     }
 
                     if (targetRow != row) {
-                        // Fusionar o mover ficha
                         if (fichas[targetRow][col].getValor() == fichas[row][col].getValor() && !fichas[targetRow][col].isMerged()) {
                             fichas[targetRow][col].fusionar(fichas[row][col]);
                         } else {
@@ -240,14 +256,15 @@ public class Juego2048 extends AppCompatActivity {
             }
         }
 
-        resetMergedStatus(); // Reiniciar estado de fusión
+        resetMergedStatus();
         if (moved) {
-            addRandomFicha(); // Añadir una nueva ficha solo si hubo movimiento
+            addRandomFicha();
         }
     }
 
 
     private void moveDown() {
+        guardarEstadoAnterior(); // Guardar el turno antes de mover
         boolean moved = false;
         for (int col = 0; col < GRID_SIZE; col++) {
             for (int row = GRID_SIZE - 2; row >= 0; row--) {
@@ -285,6 +302,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void moveLeft() {
+        guardarEstadoAnterior(); // Guardar el turno antes de mover
         boolean moved = false;
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 1; col < GRID_SIZE; col++) {
@@ -322,6 +340,7 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private void moveRight() {
+        guardarEstadoAnterior(); // Guardar el turno antes de mover
         boolean moved = false;
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = GRID_SIZE - 2; col >= 0; col--) {
@@ -366,6 +385,16 @@ public class Juego2048 extends AppCompatActivity {
         }
     }
 
+    private void guardarEstadoAnterior() {
+        turnoAnterior = new Ficha[GRID_SIZE][GRID_SIZE];
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                turnoAnterior[i][j] = new Ficha(fichas[i][j].getValor(), i, j);
+            }
+        }
+    }
+
+
     private void verificarEstadoJuego() {
         if (checkVictory()) {
             finalizarJuego("¡Has ganado!");
@@ -379,42 +408,68 @@ public class Juego2048 extends AppCompatActivity {
     }
 
     private boolean checkVictory() {
+        boolean victoria = false;
+        int valorVictoria = 2048;
+
         for (int i = 0; i < GRID_SIZE; i++) {
             for (int j = 0; j < GRID_SIZE; j++) {
-                if (fichas[i][j].getValor() == 2048) {
-                    return true;
+                if (fichas[i][j].getValor() == valorVictoria) {
+                    victoria = true;
+                    break;
                 }
             }
         }
-        return false;
+        return victoria;
     }
 
     private boolean checkGameOver() {
+        boolean derrota = true;
+        // 1. Verificar si hay espacios vacíos (juego continúa si hay al menos uno)
         for (int i = 0; i < GRID_SIZE; i++) {
             for (int j = 0; j < GRID_SIZE; j++) {
                 if (fichas[i][j].getValor() == 0) {
-                    return false;
-                }
-                if (i > 0 && fichas[i][j].getValor() == fichas[i - 1][j].getValor()) {
-                    return false;
-                }
-                if (i < GRID_SIZE - 1 && fichas[i][j].getValor() == fichas[i + 1][j].getValor()) {
-                    return false;
-                }
-                if (j > 0 && fichas[i][j].getValor() == fichas[i][j - 1].getValor()) {
-                    return false;
-                }
-                if (j < GRID_SIZE - 1 && fichas[i][j].getValor() == fichas[i][j + 1].getValor()) {
-                    return false;
+                    derrota = false; // Aún hay espacio, el juego no ha terminado
+                    break;
                 }
             }
         }
-        return true;
+
+        if(derrota) {
+            // 2. Verificar si hay movimientos posibles (fusiones permitidas)
+            for (int i = 0; i < GRID_SIZE; i++) {
+                for (int j = 0; j < GRID_SIZE; j++) {
+                    int valorActual = fichas[i][j].getValor();
+
+                    // Comparar con la ficha de arriba
+                    if (i > 0 && valorActual == fichas[i - 1][j].getValor()) {
+                        derrota = false;
+                        break;
+                    }
+                    // Comparar con la ficha de abajo
+                    if (i < GRID_SIZE - 1 && valorActual == fichas[i + 1][j].getValor()) {
+                        derrota =  false;
+                        break;
+                    }
+                    // Comparar con la ficha de la izquierda
+                    if (j > 0 && valorActual == fichas[i][j - 1].getValor()) {
+                        derrota =  false;
+                        break;
+                    }
+                    // Comparar con la ficha de la derecha
+                    if (j < GRID_SIZE - 1 && valorActual == fichas[i][j + 1].getValor()) {
+                        derrota =  false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Si no hay espacios vacíos y no hay movimientos posibles, el juego ha terminado
+        return derrota;
     }
 
     private void finalizarJuego(String mensaje) {
         chronometer.stop();
-
 
         new AlertDialog.Builder(this)
                 .setTitle("Fin del juego")

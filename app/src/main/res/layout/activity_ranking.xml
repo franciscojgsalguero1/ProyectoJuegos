@@ -13,32 +13,33 @@
         <!-- Título del Ranking -->
         <TextView
             android:id="@+id/tvRankingTitle"
-            android:layout_width="match_parent"
+            android:layout_width="318dp"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
             android:text="Ranking"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:padding="8dp" />
+            android:textStyle="bold" />
 
         <!-- Tabla de ranking -->
         <TableLayout
             android:id="@+id/tableRanking"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:stretchColumns="*"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:stretchColumns="*">
 
             <!-- Fila de cabecera -->
             <TableRow>
+
                 <TextView
                     android:id="@+id/tvHeaderNombre"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nombre"
                     android:gravity="center"
-                    android:textStyle="bold"
-                    android:padding="8dp"/>
+                    android:padding="8dp"
+                    android:text="Nombre"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvHeaderPuntos"
@@ -51,8 +52,8 @@
 
                 <TextView
                     android:id="@+id/tvHeaderTiempo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="103dp"
+                    android:layout_height="match_parent"
                     android:gravity="center"
                     android:padding="10dp"
                     android:text="Tiempo"

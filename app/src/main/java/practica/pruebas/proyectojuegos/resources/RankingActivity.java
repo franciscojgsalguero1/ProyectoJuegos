@@ -45,10 +45,9 @@ public class RankingActivity extends AppCompatActivity {
     }
 
     private void cargarRanking() {
-        // Obtenemos un cursor con los jugadores ordenados por puntos (ya sea con LIMIT 10 o limitándolo aquí)
         Cursor cursor = dbManager.obtenerJugadores(false, true);
         if (cursor != null && cursor.moveToFirst()) {
-            // Si ya hay filas (excepto la cabecera) en la tabla, las eliminamos.
+            // Eliminar filas anteriores de la tabla, excepto la cabecera
             int childCount = tableRanking.getChildCount();
             if(childCount > 1) {
                 tableRanking.removeViews(1, childCount - 1);
@@ -56,20 +55,27 @@ public class RankingActivity extends AppCompatActivity {
 
             int posicion = 1;
             do {
-                if (posicion > 10) break; // Solo mostramos las 10 mejores
+                if (posicion > 10) break; // Solo mostramos las 10 mejores puntuaciones
 
                 String nombreJugador = cursor.getString(cursor.getColumnIndex(DatabaseManager.COLUMN_JUGADOR));
                 int puntos = cursor.getInt(cursor.getColumnIndex(DatabaseManager.COLUMN_PUNTOS));
-                Long tiempo = cursor.getLong(cursor.getColumnIndex(DatabaseManager.COLUMN_TIEMPO));
+                long tiempoMs = cursor.getLong(cursor.getColumnIndex(DatabaseManager.COLUMN_TIEMPO));
+
+                // Convertir milisegundos a minutos y segundos
+                int totalSeconds = (int) (tiempoMs / 1000);
+                int minutes = totalSeconds / 60;
+                int seconds = totalSeconds % 60;
+                String tiempoFormateado = String.format("%02d:%02d", minutes, seconds);
 
                 // Crear una nueva fila para el ranking
                 TableRow row = new TableRow(this);
                 row.setPadding(16, 16, 16, 16);
+                //row.setBackgroundResource(R.drawable.table_row_bg); // Opcional: para un fondo bonito
 
                 // LayoutParams para los TextViews
                 TableRow.LayoutParams params = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10, 10, 20, 10);
+                params.setMargins(50, 8, 50, 8);
 
                 // TextView para el nombre y posición
                 TextView tvNombre = new TextView(this);
@@ -77,7 +83,7 @@ public class RankingActivity extends AppCompatActivity {
                 tvNombre.setTextSize(18);
                 tvNombre.setTextColor(getResources().getColor(android.R.color.black));
                 tvNombre.setLayoutParams(params);
-                tvNombre.setGravity(Gravity.CENTER);
+                tvNombre.setGravity(Gravity.CENTER_VERTICAL);
 
                 // TextView para la puntuación
                 TextView tvPuntos = new TextView(this);
@@ -85,22 +91,22 @@ public class RankingActivity extends AppCompatActivity {
                 tvPuntos.setTextSize(18);
                 tvPuntos.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
                 tvPuntos.setLayoutParams(params);
-                tvPuntos.setGravity(Gravity.CENTER);
+                tvPuntos.setGravity(Gravity.CENTER_VERTICAL);
 
-                // TextView para la puntuación
+                // TextView para el tiempo jugado
                 TextView tvTiempo = new TextView(this);
-                tvPuntos.setText(tiempo.toString());
-                tvPuntos.setTextSize(10);
-                tvPuntos.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
-                tvPuntos.setLayoutParams(params);
-                tvPuntos.setGravity(Gravity.CENTER);
+                tvTiempo.setText(tiempoFormateado);
+                tvTiempo.setTextSize(18);
+                tvTiempo.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                tvTiempo.setLayoutParams(params);
+                tvTiempo.setGravity(Gravity.CENTER_VERTICAL);
 
-                // Añadir los TextViews a la fila
+                // Añadimos los TextViews a la fila
                 row.addView(tvNombre);
                 row.addView(tvPuntos);
-                //row.addView(tvTiempo);
+                row.addView(tvTiempo);
 
-                // Añadir la fila al TableLayout
+                // Añadimos la fila al TableLayout
                 tableRanking.addView(row);
 
                 posicion++;
@@ -110,4 +116,5 @@ public class RankingActivity extends AppCompatActivity {
             Toast.makeText(this, "No hay datos de ranking", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

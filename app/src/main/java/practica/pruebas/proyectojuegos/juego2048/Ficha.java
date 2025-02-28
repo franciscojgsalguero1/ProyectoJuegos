@@ -10,7 +10,7 @@ public class Ficha {
     private boolean merged;
 
     public Ficha(int valor, int fila, int columna) {
-        this.valor = valor;
+        this.valor = Math.max(0, valor); // Evita valores negativos
         this.fila = fila;
         this.columna = columna;
         this.merged = false;
@@ -21,7 +21,7 @@ public class Ficha {
     }
 
     public void setValor(int valor) {
-        this.valor = valor;
+        this.valor = Math.max(0, valor); // Evita valores negativos
     }
 
     public int getFila() {
@@ -40,20 +40,27 @@ public class Ficha {
         this.merged = merged;
     }
 
-    public void fusionar(Ficha otraFicha) {
-        if (!this.merged && !otraFicha.isMerged() && this.valor == otraFicha.getValor()) {
+    /**
+     * Fusiona esta ficha con otra, si es posible.
+     * Retorna `true` si la fusión fue exitosa.
+     */
+    public boolean fusionar(Ficha otraFicha) {
+        if (!this.merged && !otraFicha.isMerged() && this.valor == otraFicha.getValor() && this.valor > 0) {
             this.valor *= 2;
             this.merged = true;
             otraFicha.setValor(0);
+            return true; // Indica que hubo fusión
         }
+        return false;
     }
 
     public void reiniciarFusion() {
         this.merged = false;
     }
 
-
-
+    /**
+     * Devuelve el color correspondiente según el valor de la ficha.
+     */
     public int getColor() {
         switch (valor) {
             case 2: return R.color.tile_2;
@@ -67,7 +74,7 @@ public class Ficha {
             case 512: return R.color.tile_512;
             case 1024: return R.color.tile_1024;
             case 2048: return R.color.tile_2048;
-            default: return R.color.tile_high;
+            default: return R.color.tile_high; // Color para valores mayores a 2048
         }
     }
 }

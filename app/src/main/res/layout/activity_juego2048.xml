@@ -26,7 +26,8 @@
         android:textSize="24sp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="273dp"
-        tools:layout_editor_absoluteY="-4dp" />
+        tools:layout_editor_absoluteY="-4dp"
+        tools:ignore="MissingConstraints" />
 
     <GridLayout
         android:id="@+id/gridLayout"
@@ -44,6 +45,18 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
+        android:id="@+id/btn_turn_comeback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp"
+        android:text="Undo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.857"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
         android:id="@+id/btn_back_to_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,6 +65,7 @@
         android:text="Back to Menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.155"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
